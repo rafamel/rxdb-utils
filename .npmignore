@@ -1,0 +1,5 @@
+src
+test
+_test.js
+*.log
+DS_Store
