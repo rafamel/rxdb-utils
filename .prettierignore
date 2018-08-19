@@ -6,3 +6,4 @@ out
 .cache
 coverage
 node_modules
+*.md

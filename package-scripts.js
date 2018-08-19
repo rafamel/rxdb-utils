@@ -1,6 +1,6 @@
 const registerSx = (sx, _ = (global.SX = {})) =>
   Object.keys(sx).forEach((key) => (global.SX[key] = sx[key]));
-const sx = (name) => `node -r ./package-scripts.js -e global.SX.${name}\\(\\)`;
+const sx = (name) => `node -r ./package-scripts.js -e "global.SX.${name}()"`;
 const scripts = (x) => ({ scripts: x });
 const exit0 = (x) => `${x} || shx echo `;
 const series = (x) => `(${x.join(') && (')})`;
@@ -15,7 +15,7 @@ module.exports = scripts({
     'babel src --out-dir lib'
   ]),
   watch: 'onchange "./src/**/*.{js,jsx,ts}" -i -- nps private.watch',
-  fix: `prettier --write "./**/*.{js,jsx,ts,scss,md}"`,
+  fix: `prettier --write "./**/*.{js,jsx,ts,scss}"`,
   lint: {
     default: 'eslint ./src --ext .js',
     test: 'eslint ./test --ext .js',
@@ -25,16 +25,14 @@ module.exports = scripts({
     default: 'nps lint.test && jest ./test/.*.test.js --runInBand',
     watch: 'onchange "./**/*.{js,jsx}" -i -- nps private.test_watch'
   },
-  validate: series([
-    'nps fix lint lint.test lint.md test',
-    `npm outdated || ${sx('countdown')}`
-  ]),
+  validate: 'nps fix lint lint.test lint.md test private.validate_last',
   update: 'npm update --save/save-dev && npm outdated',
   clean: `${exit0('shx rm -r lib coverage')} && shx rm -rf node_modules`,
   // Private
   private: {
     watch: `${sx('clear')} && nps lint`,
-    test_watch: `${sx('clear')} && nps test`
+    test_watch: `${sx('clear')} && nps test`,
+    validate_last: `npm outdated || ${sx('countdown')}`
   }
 });
 

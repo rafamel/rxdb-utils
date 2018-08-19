@@ -23,13 +23,20 @@ export default function select(fn) {
     };
   }
   return function selectObserved(Component) {
-    const SelectObserved = (props) => {
-      const selected = fn(props);
-      const selectedProps = testSelect(selected);
-      return selectedProps ? <Component {...props} {...selectedProps} /> : null;
-    };
-    if (Component.name) {
-      SelectObserved.displayName = `SelectObserved(${Component.name})`;
+    class SelectObserved extends React.Component {
+      static displayName = Component.name
+        ? `SelectObserved(${Component.name})`
+        : 'SelectObserved';
+      selectedProps = false;
+      render() {
+        const selected = fn(this.props);
+        const selectedProps = testSelect(selected);
+        if (selectedProps) this.selectedProps = selectedProps;
+
+        return this.selectedProps ? (
+          <Component {...this.props} {...this.selectedProps} />
+        ) : null;
+      }
     }
     return observer(SelectObserved);
   };

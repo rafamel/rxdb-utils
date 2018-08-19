@@ -1,4 +1,5 @@
 /* eslint-disable babel/no-invalid-this */
+import { autorun } from 'mobx';
 import { fromResource } from 'mobx-utils';
 import { onable } from './onable';
 
@@ -12,6 +13,8 @@ function setPropertyGetters() {
   const properties = Object.entries(
     Object.getOwnPropertyDescriptors(this)
   ).reduce((acc, [key]) => {
+    if (key.search(/(^_|_$)/) >= 0) return acc; // Exclude internal properties
+
     acc[key] = { get: () => this[key], enumerable: true };
     return acc;
   }, {});
@@ -106,7 +109,19 @@ export function RxQuery(proto) {
       return this[resolvedSymbol] || false;
     },
     promise() {
-      return this.exec();
+      return new Promise((resolve, reject) => {
+        try {
+          const disposer = autorun(() => {
+            const val = this.current();
+            if (this.resolved()) {
+              resolve(val);
+              disposer();
+            }
+          });
+        } catch (e) {
+          reject(e);
+        }
+      });
     },
     dispose() {
       if (!this[mobxSymbol]) return false;

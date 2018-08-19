@@ -1,3 +1,8 @@
+export function isOnable(obj) {
+  if (!obj) return false;
+  return obj.current && obj.resolved && obj.promise && true;
+}
+
 export function onable(parent, cbArr = []) {
   let resolved = false;
   return {
@@ -10,7 +15,7 @@ export function onable(parent, cbArr = []) {
         ans = cb(ans);
 
         // Check if it's returning an onable
-        if (ans.current && ans.resolved && ans.promise) {
+        if (isOnable(ans)) {
           const inner = ans.current();
           if (!ans.resolved()) return undefined;
           ans = inner;
