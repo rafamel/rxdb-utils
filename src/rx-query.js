@@ -1,49 +1,32 @@
 /* eslint-disable babel/no-invalid-this */
 import { autorun } from 'mobx';
 import toMobx from './to-mobx';
-import { onable } from './onable';
-import { doneSymbol } from './create-document';
+import { currentSymbol, mobxSymbol } from './symbols';
+import { safe, onable } from './onable';
 
-const mobxSymbol = Symbol('observer');
 export default function RxQuery(proto) {
   Object.assign(proto, {
+    [currentSymbol]() {
+      if (!this[mobxSymbol]) this[mobxSymbol] = toMobx(this.$);
+      return this[mobxSymbol].get();
+    },
     current() {
-      if (!this[mobxSymbol]) {
-        const mbx = { it: 0, last: [-1, true] };
-        mbx.obs = toMobx(this.$, undefined, (data) => {
-          mbx.it++;
-          return data;
-        });
-        this[mobxSymbol] = mbx;
-      }
-      const { obs, it, last } = this[mobxSymbol];
-      const data = obs.get();
-      if (!data || (it === last[0] && last[1])) return data;
-
-      const arr = Array.isArray(data) ? data : [data];
-      for (let i = 0; i < arr.length; i++) {
-        const doc = arr[i];
-        if (!doc[doneSymbol].get()) {
-          this[mobxSymbol].last = [it, false];
-          return undefined;
-        }
-      }
-      this[mobxSymbol].last = [it, true];
-      return data;
+      return safe.call(this);
     },
     promise() {
+      let disposer;
       return new Promise((resolve, reject) => {
         try {
-          const disposer = autorun(() => {
+          disposer = autorun(() => {
             const val = this.current();
-            if (val !== undefined) {
-              resolve(val);
-              disposer();
-            }
+            if (val !== undefined) resolve(val);
           });
         } catch (e) {
           reject(e);
         }
+      }).then((val) => {
+        disposer();
+        return this.exec().then((x) => (x === undefined ? val : x));
       });
     },
     on(cb) {

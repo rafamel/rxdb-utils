@@ -1,17 +1,29 @@
 /* eslint-disable babel/no-invalid-this */
 import { computed, autorun, observable } from 'mobx';
-
-import { isOnable } from './onable';
+import { mobxSymbol, computedSymbol, currentSymbol } from './symbols';
 import toMobx from './to-mobx';
+import uuid from 'uuid/v4';
 
-const mobxSymbol = Symbol('observer');
-const computedSymbol = Symbol('computed');
-export const doneSymbol = Symbol('done');
-export default async function createDocument() {
+const waitTillDone = {};
+export function allCreated() {
+  const waitKeys = Object.keys(waitTillDone);
+  if (!waitKeys.length) return true;
+
+  for (let i = 0; i < waitKeys.length; i++) {
+    const key = waitKeys[i];
+    const isDone = waitTillDone[key];
+    if (!isDone || isDone.get()) delete waitTillDone[key];
+    else return false;
+  }
+  return true;
+}
+
+export default function createDocument() {
+  const uid = uuid();
+  waitTillDone[uid] = observable.box(false);
+
   /* Make properties mobx observables */
   this[mobxSymbol] = {};
-  this[doneSymbol] = observable.box(false);
-
   const subscriberKeys = Object.keys(
     Object.getOwnPropertyDescriptors(this)
   ).filter((x) => x.search(/^[^_].+\$$/) >= 0);
@@ -33,10 +45,9 @@ export default async function createDocument() {
     return acc;
   }, {});
   Object.defineProperties(this, subscriberGetters);
-
   /* End make properties mobx observables */
 
-  /* Actual computed work */
+  /* Computed properties */
   this[computedSymbol] = {};
 
   const options = this.collection.options;
@@ -54,45 +65,43 @@ export default async function createDocument() {
     Object.defineProperties(this, getters);
 
     let disposer;
-    await new Promise((resolve, reject) => {
-      let error;
-      let timeout;
-      disposer = autorun(() => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-          throw error;
-        }, 2500);
-        try {
-          while (properties.length) {
-            const [key] = properties[0];
-            let val = this[key];
-            if (isOnable(val)) {
-              val = val.current();
-              if (val === undefined) {
-                throw Error(`Computed ${key} not resolved`);
-              }
-              const computedProperty = this[computedSymbol][key];
-              let lastVal;
-              this[computedSymbol][key] = {
-                get: () => {
-                  const val = computedProperty.get().current();
-                  if (val === undefined) return lastVal;
-                  return (lastVal = val);
-                }
-              };
+    let error;
+    let timeout;
+    disposer = autorun(() => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        throw error;
+      }, 2500);
+      try {
+        while (properties.length) {
+          const [key] = properties[0];
+          let val = this[key];
+          if (val && val[currentSymbol]) {
+            val = val[currentSymbol]();
+            if (val === undefined) {
+              throw Error(`Computed ${key} not resolved`);
             }
-            properties.shift();
+            const computedProperty = this[computedSymbol][key];
+            let lastVal;
+            this[computedSymbol][key] = {
+              get: () => {
+                const val = computedProperty.get()[currentSymbol]();
+                if (val === undefined) return lastVal;
+                return (lastVal = val);
+              }
+            };
           }
-          resolve();
-          clearTimeout(timeout);
-        } catch (e) {
-          error = e;
+          properties.shift();
         }
-      });
+        waitTillDone[uid].set(true);
+        clearTimeout(timeout);
+        disposer();
+      } catch (e) {
+        error = e;
+      }
     });
-    disposer();
+  } else {
+    waitTillDone[uid].set(true);
   }
-  this[doneSymbol].set(true);
-  this[doneSymbol] = { get: () => true };
-  /* End actual computed work */
+  /* End computed properties */
 }
