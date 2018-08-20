@@ -1,14 +1,13 @@
 export function isOnable(obj) {
   if (!obj) return false;
-  return obj.current && obj.resolved && obj.promise && true;
+  return obj.current && obj.promise && obj.on && true;
 }
 
 export function onable(parent, cbArr = []) {
-  let resolved = false;
   return {
     current() {
       let ans = parent.current();
-      if (!parent.resolved()) return undefined;
+      if (ans === undefined) return undefined;
 
       for (let i = 0; i < cbArr.length; i++) {
         const cb = cbArr[i];
@@ -17,15 +16,11 @@ export function onable(parent, cbArr = []) {
         // Check if it's returning an onable
         if (isOnable(ans)) {
           const inner = ans.current();
-          if (!ans.resolved()) return undefined;
-          ans = inner;
+          if (inner === undefined) return undefined;
+          return inner;
         }
       }
-      resolved = true;
       return ans;
-    },
-    resolved() {
-      return resolved;
     },
     promise() {
       let promise = parent.promise();
@@ -33,9 +28,7 @@ export function onable(parent, cbArr = []) {
       for (let i = 0; i < cbArr.length; i++) {
         const cb = cbArr[i];
         promise = promise.then(cb).then((ans) => {
-          return ans.current && ans.resolved && ans.promise
-            ? ans.promise()
-            : ans;
+          return isOnable(ans) ? ans.promise() : ans;
         });
       }
       return promise;
@@ -53,20 +46,17 @@ export function on(onables) {
     current() {
       const currentArr = [];
       for (let i = 0; i < onables.length; i++) {
-        const one = onables[i];
-        currentArr.push((one.current && one.current()) || one);
+        let one = onables[i];
+        if (one.current) {
+          one = one.current();
+          if (one === undefined) return undefined;
+        }
+        currentArr.push(one);
       }
-      return this.resolved() ? currentArr : undefined;
-    },
-    resolved() {
-      for (let i = 0; i < onables.length; i++) {
-        if (!onables[i].resolved) continue;
-        if (!onables[i].resolved()) return false;
-      }
-      return true;
+      return currentArr;
     },
     promise() {
-      return Promise.all(onables.map((x) => (x.promise && x.promise()) || x));
+      return Promise.all(onables.map((x) => (x.promise ? x.promise() : x)));
     },
     on(cb) {
       return onable(this, [cb]);
