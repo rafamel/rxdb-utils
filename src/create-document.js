@@ -12,7 +12,7 @@ export function allCreated() {
   for (let i = 0; i < waitKeys.length; i++) {
     const key = waitKeys[i];
     const isDone = waitTillDone[key];
-    if (!isDone || isDone.get()) delete waitTillDone[key];
+    if (isDone && isDone.get()) delete waitTillDone[key];
     else return false;
   }
   return true;
@@ -93,7 +93,7 @@ export default function createDocument() {
           }
           properties.shift();
         }
-        waitTillDone[uid].set(true);
+        waitTillDone[uid] && waitTillDone[uid].set(true);
         clearTimeout(timeout);
         disposer();
       } catch (e) {

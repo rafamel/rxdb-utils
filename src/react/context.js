@@ -9,7 +9,16 @@ class Provider extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     db: PropTypes.any.isRequired,
-    onReady: PropTypes.func
+    hide: PropTypes.bool,
+    onMount: PropTypes.func,
+    onReadyOrUnmount: PropTypes.func,
+    defaults: PropTypes.shape({
+      onMount: PropTypes.func,
+      onReadyOrUnmount: PropTypes.func
+    })
+  };
+  static defaultProps = {
+    defaults: {}
   };
   state = {
     db: null,
@@ -23,7 +32,10 @@ class Provider extends React.Component {
   };
   componentDidMount() {
     this._isMounted = true;
-    this.props.db.then((db) => this._isMounted && this.setState({ db }));
+    const { db, onMount, onReadyOrUnmount } = this.props;
+
+    if (onMount) onMount();
+    db.then((db) => this._isMounted && this.setState({ db }));
     let hit = false;
     this.interval = setInterval(() => {
       if (!this.state.db) return;
@@ -32,30 +44,38 @@ class Provider extends React.Component {
       if (!hit) hit = true;
       else {
         clearInterval(this.interval);
-        if (this.props.onReady) this.props.onReady();
+        if (onReadyOrUnmount) onReadyOrUnmount();
         this.setState({ ready: true });
       }
     }, 15);
   }
   componentWillUnmount() {
-    this._isMounted = false;
+    const { onReadyOrUnmount } = this.props;
     clearInterval(this.interval);
+    if (!this.state.ready && onReadyOrUnmount) onReadyOrUnmount();
+    this._isMounted = false;
   }
   render() {
     const { db, ready } = this.state;
+    const { defaults, hide } = this.props;
 
     if (!db) return null;
-
-    return ready ? (
-      <BaseProvider value={{ db, _rxdb_mobx_register: () => {} }}>
+    const provider = (
+      <BaseProvider
+        value={{
+          db,
+          _rxdb_mobx_defaults: defaults,
+          _rxdb_mobx_register: this.register
+        }}
+      >
         {this.props.children}
       </BaseProvider>
+    );
+
+    return ready || !hide ? (
+      provider
     ) : (
-      <div style={{ display: 'none' }}>
-        <BaseProvider value={{ db, _rxdb_mobx_register: this.register }}>
-          {this.props.children}
-        </BaseProvider>
-      </div>
+      <div style={{ display: 'none' }}>{provider}</div>
     );
   }
 }
