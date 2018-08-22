@@ -35,6 +35,7 @@ export default function createDocument() {
         if (!this[mobxSymbol][key]) {
           this[mobxSymbol][key] = toMobx(
             this[subscriberKey],
+            // @todo test RxDocument._data contains properties on RxDB
             () => this._data[key]
           );
         }
@@ -71,7 +72,7 @@ export default function createDocument() {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         throw error;
-      }, 2500);
+      }, 5000);
       try {
         while (properties.length) {
           const [key] = properties[0];

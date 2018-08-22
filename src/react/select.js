@@ -20,17 +20,22 @@ function testSelect(selected) {
   return ans;
 }
 
-export default function select(fn, onMount, onReadyOrUnmount) {
-  // fn can be a function or an array of strings
-  if (fn && Array.isArray(fn)) {
-    const arr = fn;
-    fn = (props) => {
-      return arr.reduce((acc, key) => {
-        acc[key] = props[key];
-        return acc;
-      }, {});
-    };
-  }
+function getFn(fn) {
+  if (!fn || !Array.isArray(fn)) return fn;
+
+  const arr = fn;
+  return (props) => {
+    return arr.reduce((acc, key) => {
+      acc[key] = props[key];
+      return acc;
+    }, {});
+  };
+}
+
+export default function select(fn, onMount, onReadyOrUnmount, onUpdate) {
+  // fn and holdFn can be a function or an array of strings
+  fn = getFn(fn);
+
   return function selectConsumer(Component) {
     class SelectConsumer extends React.Component {
       static displayName = Component.name
@@ -44,32 +49,27 @@ export default function select(fn, onMount, onReadyOrUnmount) {
         })
       };
       selectedProps = false;
-      onMount = onMount;
-      onReadyOrUnmount = onReadyOrUnmount;
+      onMount = null;
+      onReadyOrUnmount = null;
       called = false;
       componentDidMount() {
         const { _rxdb_mobx_defaults: defaults } = this.props;
+        this.onMount = () => {
+          defaults.onMount && defaults.onMount();
+          onMount && onMount();
+        };
+        this.onReadyOrUnmount = () => {
+          defaults.onReadyOrUnmount && defaults.onReadyOrUnmount();
+          onReadyOrUnmount && onReadyOrUnmount();
+        };
 
-        if (defaults.onMount) {
-          this.onMount = onMount
-            ? () => (defaults.onMount() || true) && onMount()
-            : defaults.onMount;
-        }
-        if (defaults.onReadyOrUnmount) {
-          this.onReadyOrUnmount = onReadyOrUnmount
-            ? () => (defaults.onReadyOrUnmount() || true) && onReadyOrUnmount()
-            : defaults.onReadyOrUnmount;
-        }
-
-        this.onMount && this.onMount();
-        this.selectedProps && this.onReadyOrUnmount && this.onReadyOrUnmount();
+        this.onMount();
+        this.selectedProps && this.onReadyOrUnmount();
         this.called = true;
       }
       componentWillUnmount() {
         if (this.id) this.props._rxdb_mobx_register(this.id, true);
-        if (!this.selectedProps && this.called) {
-          this.onReadyOrUnmount && this.onReadyOrUnmount();
-        }
+        if (!this.selectedProps && this.called) this.onReadyOrUnmount();
       }
       render() {
         const {
@@ -88,8 +88,9 @@ export default function select(fn, onMount, onReadyOrUnmount) {
         if (selectedProps) {
           if (!this.selectedProps) {
             _register(this.id, true);
-            this.onReadyOrUnmount && this.called && this.onReadyOrUnmount();
+            this.called && this.onReadyOrUnmount();
           }
+          onUpdate && onUpdate.call();
           this.selectedProps = selectedProps;
         }
 
