@@ -1,16 +1,15 @@
 # rxdb-utils
 
 [![Version](https://img.shields.io/github/package-json/v/rafamel/rxdb-utils.svg)](https://github.com/rafamel/rxdb-utils)
-
 <!-- [![Build Status](https://travis-ci.org/rafamel/rxdb-utils.svg)](https://travis-ci.org/rafamel/rxdb-utils)
 [![Coverage](https://img.shields.io/coveralls/rafamel/rxdb-utils.svg)](https://coveralls.io/github/rafamel/rxdb-utils)  -->
-
-[![Dependencies](https://david-dm.org/rafamel/rxdb-utils/status.svg)](https://david-dm.org/rafamel/rxdb-utils) [![Vulnerabilities](https://snyk.io/test/npm/rxdb-utils/badge.svg)](https://snyk.io/test/npm/rxdb-utils) [![Issues](https://img.shields.io/github/issues/rafamel/rxdb-utils.svg)](https://github.com/rafamel/rxdb-utils/issues) [![License](https://img.shields.io/github/license/rafamel/rxdb-utils.svg)](https://github.com/rafamel/rxdb-utils/blob/master/LICENSE)
+[![Dependencies](https://david-dm.org/rafamel/rxdb-utils/status.svg)](https://david-dm.org/rafamel/rxdb-utils)
+[![Vulnerabilities](https://snyk.io/test/npm/rxdb-utils/badge.svg)](https://snyk.io/test/npm/rxdb-utils)
+[![Issues](https://img.shields.io/github/issues/rafamel/rxdb-utils.svg)](https://github.com/rafamel/rxdb-utils/issues)
+[![License](https://img.shields.io/github/license/rafamel/rxdb-utils.svg)](https://github.com/rafamel/rxdb-utils/blob/master/LICENSE)
 
 <!-- markdownlint-disable MD036 -->
-
 **RxDB's missing pieces**
-
 <!-- markdownlint-enable MD036 -->
 
 **ALPHA STAGE ALERT:** This library is still on its initial stages of development and not yet properly tested.
@@ -23,7 +22,7 @@ It's required to have `rxdb@7.7.1` installed in order to use `rxdb-utils`: `npm 
 
 ## Setup
 
-`rxdb-utils` is comprised of a series of RxDB plugins to provide it with some missing functionality.
+`rxdb-utils` is comprised of a series of RxDB plugins to provide it with some missing functionality. You can see a usage example with React, along with [`rxdb-mobx`](https://www.npmjs.com/package/rxdb-mobx), [here](https://github.com/rafamel/rxdb-mobx/tree/master/example).
 
 You can either register them one by one - choosing only those you'd like to add, or register them all with `register()`;
 

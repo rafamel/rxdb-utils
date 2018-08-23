@@ -3,19 +3,22 @@ export default {
   prototypes: {},
   overwritable: {},
   hooks: {
-    preCreateRxCollection(model) {
-      if (!model.statics) model.statics = {};
-      if (!model.methods) model.methods = {};
-
-      model.statics.collections = function collections() {
-        return this.database.collections;
+    preCreateRxCollection(model = {}) {
+      return {
+        ...model,
+        statics: {
+          ...(model.statics || {}),
+          collections() {
+            return this.database.collections;
+          }
+        },
+        methods: {
+          ...(model.methods || {}),
+          collections() {
+            return this.collection.collections();
+          }
+        }
       };
-
-      model.methods.collections = function collections() {
-        return this.collection.collections();
-      };
-
-      return model;
     }
   }
 };

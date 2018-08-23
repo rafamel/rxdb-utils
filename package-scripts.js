@@ -15,7 +15,7 @@ module.exports = scripts({
     'babel src --out-dir lib'
   ]),
   watch: 'onchange "./src/**/*.{js,jsx,ts}" -i -- nps private.watch',
-  fix: `prettier --write "./**/*.{js,jsx,ts,scss,md}"`,
+  fix: `prettier --write "./**/*.{js,jsx,ts,scss}"`,
   lint: {
     default: 'eslint ./src --ext .js',
     test: 'eslint ./test --ext .js',

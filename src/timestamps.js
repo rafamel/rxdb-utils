@@ -31,28 +31,34 @@ export default {
   },
   overwritable: {},
   hooks: {
-    preCreateRxCollection(model) {
+    preCreateRxCollection(model = {}) {
       const timestamps = model && model.options && model.options.timestamps;
       if (!timestamps) return model;
 
       // Set schema
-      if (!model.schema) model.schema = {};
-      if (!model.schema.properties) model.schema.properties = {};
-      model.schema.properties.createdAt = model.schema.properties.createdAt || {
-        format: 'date-time',
-        type: 'string'
-      };
-      model.schema.properties.updatedAt = model.schema.properties.updatedAt || {
-        format: 'date-time',
-        type: 'string'
-      };
 
-      model.schema.required = (model.schema.required || []).concat([
-        'createdAt',
-        'updatedAt'
-      ]);
-
-      return model;
+      return {
+        ...model,
+        schema: {
+          ...(model.schema || {}),
+          properties: {
+            createdAt: {
+              format: 'date-time',
+              type: 'string'
+            },
+            updatedAt: {
+              format: 'date-time',
+              type: 'string'
+            },
+            ...((model.schema && model.schema.properties) || {})
+          },
+          required: [
+            ...((model.schema && model.schema.required) || []),
+            'createdAt',
+            'updatedAt'
+          ]
+        }
+      };
     }
   }
 };
