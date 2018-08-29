@@ -36,31 +36,20 @@ export default {
         return replication;
       };
     },
-    preCreateRxCollection(model = {}) {
+    preCreateRxCollection(model) {
       const name = model.name;
       if (!name) throw Error('RxCollection(s) must have a name property');
 
-      if (
-        model.schema &&
-        model.schema.properties &&
-        model.schema.properties.rx_model
-      ) {
+      if (!model.schema) model.schema = {};
+      if (!model.schema.properties) model.schema.properties = {};
+      const rxModel = model.schema.properties.rx_model;
+      if (rxModel && (rxModel.type !== 'string' || rxModel.default !== name)) {
         throw Error('Schema properties cannot be called "rx_model"');
       }
-
-      return {
-        ...model,
-        schema: {
-          ...(model.schema || {}),
-          properties: {
-            ...((model.schema && model.schema.properties) || {}),
-            rx_model: {
-              type: 'string',
-              enum: [name],
-              default: name
-            }
-          }
-        }
+      model.schema.properties.rx_model = {
+        type: 'string',
+        enum: [name],
+        default: name
       };
     }
   }
