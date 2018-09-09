@@ -124,6 +124,7 @@ class Replication {
         // query: this.collections[name].find().where({ rx_model: { $eq: name } })
         direction: this.direction,
         options: {
+          ...this.options,
           live: this.options.live || true,
           retry: this.options.retry || true,
           filter: 'app/by_model',

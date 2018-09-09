@@ -14,6 +14,10 @@ module.exports = {
   plugins: ['prettier', 'jest', 'import', 'babel'],
   globals: {},
   rules: {
+    'no-warning-comments': [
+      1,
+      { terms: ['xxx', 'fixme', 'todo', 'refactor'], location: 'start' }
+    ],
     'no-console': 1,
     'jsx-a11y/no-autofocus': 0,
     'no-restricted-globals': [2, 'fetch'].concat(globals),

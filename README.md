@@ -181,7 +181,7 @@ If you are adding this plugin while there's already a deployed system with data,
 - A `replicate(remote, collections, direction, options)` method, which will return an instance of the `Replication` class.
   - `remote` will be the `pouchdb` instance or remote database address we want to synchronize all our collections with.
   - `collections`: An optional array of strings with the names of the collections to be synchronized. If `null`/`undefined`, all database collections will be replicated.
-  - `direction` and `options` are optional objects taking [the same properties as the `collection.sync()` method](https://pubkey.github.io/rxdb/replication.html), though options are restricted to `live` and `retry`.
+  - `direction` and `options` are optional objects taking [the same properties as the `collection.sync()` method](https://pubkey.github.io/rxdb/replication.html), though the `filter` and `query_param` options can't be set as they are used internally.
 - A `replications` property of type array, with all the instances of `Replication` created by calling `replicate()` on that database.
 
 `Replication` instances can then be:
