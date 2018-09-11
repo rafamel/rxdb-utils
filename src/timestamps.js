@@ -20,7 +20,7 @@ export default {
           });
 
           collection.preSave((data, doc) => {
-            if (!data.updatedAt) data.updatedAt = new Date().toISOString();
+            data.updatedAt = new Date().toISOString();
             return data;
           });
 
