@@ -11,11 +11,11 @@ export default {
           const collection = await prevCollection.call(this, model, other);
           if (!defaultValues) return collection;
 
-          collection.preInsert((doc) => {
+          collection.preInsert((data) => {
             Object.entries(defaultValues).forEach(([key, value]) => {
-              if (!doc.hasOwnProperty[key]) doc[key] = value;
+              if (!data.hasOwnProperty[key]) data[key] = value;
             });
-            return doc;
+            return data;
           });
 
           return collection;

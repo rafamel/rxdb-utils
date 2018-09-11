@@ -11,17 +11,17 @@ export default {
           if (!timestamps) return collection;
 
           // Register hooks
-          collection.preInsert((doc) => {
+          collection.preInsert((data) => {
             const now = new Date().toISOString();
-            if (!doc.createdAt) doc.createdAt = now;
-            if (!doc.updatedAt) doc.updatedAt = now;
+            if (!data.createdAt) data.createdAt = now;
+            if (!data.updatedAt) data.updatedAt = now;
 
-            return doc;
+            return data;
           });
 
-          collection.preSave((doc) => {
-            if (!doc.updatedAt) doc.updatedAt = new Date().toISOString();
-            return doc;
+          collection.preSave((data, doc) => {
+            if (!data.updatedAt) data.updatedAt = new Date().toISOString();
+            return data;
           });
 
           return collection;

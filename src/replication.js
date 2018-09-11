@@ -1,4 +1,4 @@
-import PouchDB from 'pouchdb-core';
+import { PouchDB } from 'rxdb';
 import { observable } from 'mobx';
 import { toStream } from 'mobx-utils';
 import keyCompression from 'rxdb/plugins/key-compression';
@@ -121,7 +121,6 @@ class Replication {
     const promises = collectionNames.map((name) => {
       return collections[name].sync({
         remote: this.remote,
-        // query: this.collections[name].find().where({ rx_model: { $eq: name } })
         direction: this.direction,
         options: {
           ...this.options,
@@ -161,7 +160,8 @@ class Replication {
   }
   async _createFilter() {
     // https://pouchdb.com/2015/04/05/filtered-replication.html
-    const db = new PouchDB(this.remote);
+    const remoteIsUrl = typeof this.remote === 'string';
+    const db = remoteIsUrl ? new PouchDB(this.remote) : this.remote;
     const doc = {
       version: 0,
       _id: '_design/app',
@@ -181,7 +181,7 @@ class Replication {
       })
       .catch(() => db.put(doc));
 
-    return db.close();
+    if (remoteIsUrl) db.close();
   }
   _checkActive() {
     const set = (val) => {

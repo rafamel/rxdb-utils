@@ -18,7 +18,7 @@
 
 [`npm install rxdb-utils`](https://www.npmjs.com/package/rxdb-utils)
 
-It's required to have `rxdb@7.7.1` installed in order to use `rxdb-utils`: `npm install rxdb@7.7.1`.
+It's required to have `rxdb@^8.0.0` installed in order to use `rxdb-utils`: `npm install rxdb`.
 
 ## Setup
 
@@ -155,13 +155,13 @@ db.collection({
     // ...schema goes here
   },
   options: {
-    preInsert(doc, collection) { return doc; },
-    postInsert(doc) { return doc; }
-    preSave(doc, collection) { return doc; }
-    postSave(doc) { return doc; },
-    preRemove(doc, collection) { return doc; },
-    postRemove(doc) { return doc; },
-    postCreate(doc) { return doc; }
+    preInsert(data, collection) { /* Do stuff */ },
+    postInsert(data, doc) { /* Do stuff */ }
+    preSave(data, doc) { /* Do stuff */ }
+    postSave(data, doc) { /* Do stuff */ },
+    preRemove(data, doc) { /* Do stuff */ },
+    postRemove(data, doc) { /* Do stuff */ },
+    postCreate(data, doc) { /* Do stuff */ }
   }
 });
 ```

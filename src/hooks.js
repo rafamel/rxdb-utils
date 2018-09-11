@@ -11,9 +11,13 @@ export default {
           if (!hooks) return collection;
 
           Object.keys(hooks).forEach((hook) => {
-            collection[hook](function(doc, ...other) {
-              return hooks[hook](doc, collection, ...other);
-            });
+            if (hook !== 'preInsert') collection[hook](hooks[hook]);
+            else {
+              // Add collection arg to preInsert
+              collection[hook](function(data) {
+                return hooks[hook](data, collection);
+              });
+            }
           });
 
           return collection;
