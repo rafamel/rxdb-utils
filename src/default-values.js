@@ -13,7 +13,7 @@ export default {
 
           collection.preInsert((data) => {
             Object.entries(defaultValues).forEach(([key, value]) => {
-              if (!data.hasOwnProperty[key]) data[key] = value;
+              if (!data.hasOwnProperty([key])) data[key] = value;
             });
             return data;
           });
