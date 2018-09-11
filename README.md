@@ -1,8 +1,8 @@
 # rxdb-utils
 
 [![Version](https://img.shields.io/github/package-json/v/rafamel/rxdb-utils.svg)](https://github.com/rafamel/rxdb-utils)
-<!-- [![Build Status](https://travis-ci.org/rafamel/rxdb-utils.svg)](https://travis-ci.org/rafamel/rxdb-utils)
-[![Coverage](https://img.shields.io/coveralls/rafamel/rxdb-utils.svg)](https://coveralls.io/github/rafamel/rxdb-utils)  -->
+[![Build Status](https://travis-ci.org/rafamel/rxdb-utils.svg)](https://travis-ci.org/rafamel/rxdb-utils)
+[![Coverage](https://img.shields.io/coveralls/rafamel/rxdb-utils.svg)](https://coveralls.io/github/rafamel/rxdb-utils)
 [![Dependencies](https://david-dm.org/rafamel/rxdb-utils/status.svg)](https://david-dm.org/rafamel/rxdb-utils)
 [![Vulnerabilities](https://snyk.io/test/npm/rxdb-utils/badge.svg)](https://snyk.io/test/npm/rxdb-utils)
 [![Issues](https://img.shields.io/github/issues/rafamel/rxdb-utils.svg)](https://github.com/rafamel/rxdb-utils/issues)
@@ -11,8 +11,6 @@
 <!-- markdownlint-disable MD036 -->
 **RxDB's missing pieces**
 <!-- markdownlint-enable MD036 -->
-
-**ALPHA STAGE ALERT:** This library is still on its initial stages of development and not yet properly tested.
 
 ## Install
 
@@ -155,13 +153,15 @@ db.collection({
     // ...schema goes here
   },
   options: {
-    preInsert(data, collection) { /* Do stuff */ },
-    postInsert(data, doc) { /* Do stuff */ }
-    preSave(data, doc) { /* Do stuff */ }
-    postSave(data, doc) { /* Do stuff */ },
-    preRemove(data, doc) { /* Do stuff */ },
-    postRemove(data, doc) { /* Do stuff */ },
-    postCreate(data, doc) { /* Do stuff */ }
+    hooks: {
+      preInsert(data, collection) { /* Do stuff */ },
+      postInsert(data, doc) { /* Do stuff */ },
+      preSave(data, doc) { /* Do stuff */ },
+      postSave(data, doc) { /* Do stuff */ },
+      preRemove(data, doc) { /* Do stuff */ },
+      postRemove(data, doc) { /* Do stuff */ },
+      postCreate(data, doc) { /* Do stuff */ }
+    }
   }
 });
 ```
@@ -204,7 +204,17 @@ const dbPromise = RxDB.create({
   ignoreDuplicate: false
 });
 
-dbPromise.then((db) => {
-  return db.replicate('http://localhost:5984/myremotedb/').connect();
-});
+dbPromise
+  .then((db) => {
+    // Register collections before running db.replicate()
+
+    db.collection({ /* ... */ });
+    // or via the models plugin
+    db.models([{ /* ... */ }, { /* ... */ }]);
+
+    return db;
+  })
+  .then((db) => {
+    return db.replicate('http://localhost:5984/myremotedb/').connect();
+  });
 ```

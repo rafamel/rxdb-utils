@@ -166,11 +166,13 @@ class Replication {
       version: 0,
       _id: '_design/app',
       filters: {
-        by_model: function(doc, req) {
+        // not doing fn.toString() as istambul code
+        // on tests breaks it
+        by_model: `function(doc, req) {
           return (
             doc._id === '_design/app' || doc.rx_model === req.query.rx_model
           );
-        }.toString()
+        }`
       }
     };
 
