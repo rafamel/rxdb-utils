@@ -35,7 +35,7 @@ export default function createDocument() {
         if (!this[mobxSymbol][key]) {
           this[mobxSymbol][key] = toMobx(
             this[subscriberKey],
-            // @todo test RxDocument._data contains properties on RxDB
+            // TODO: test RxDocument._data contains properties on RxDB
             () => this._data[key]
           );
         }

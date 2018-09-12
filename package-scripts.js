@@ -23,7 +23,8 @@ module.exports = scripts({
   },
   test: {
     default: 'nps lint.test && jest ./test/.*.test.js --runInBand',
-    watch: 'onchange "./**/*.{js,jsx}" -i -- nps private.test_watch'
+    watch:
+      'onchange "./{test,src}/**/*.{js,jsx,ts}" -i -- nps private.test_watch'
   },
   validate: 'nps fix lint lint.test lint.md test private.validate_last',
   update: 'npm update --save/save-dev && npm outdated',

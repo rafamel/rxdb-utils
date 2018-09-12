@@ -8,9 +8,9 @@ class Provider extends React.Component {
   static displayName = 'DBProvider';
   static propTypes = {
     children: PropTypes.node.isRequired,
-    db: PropTypes.any.isRequired,
+    db: PropTypes.any,
     hide: PropTypes.bool,
-    onMount: PropTypes.func,
+    onMountOrNull: PropTypes.func,
     onReadyOrUnmount: PropTypes.func,
     defaults: PropTypes.shape({
       onMount: PropTypes.func,
@@ -30,13 +30,18 @@ class Provider extends React.Component {
     if (!done) this.remaining[id] = true;
     else this.remaining[id] && delete this.remaining[id];
   };
-  componentDidMount() {
-    this._isMounted = true;
-    const { db, onMount, onReadyOrUnmount } = this.props;
+  async setDb(db, isMount = false) {
+    const { onMountOrNull, onReadyOrUnmount } = this.props;
 
-    if (onMount) onMount();
-    db.then((db) => this._isMounted && this.setState({ db }));
+    const dbObj = await db;
+    if (dbObj === this.state.db) return;
+
+    // eslint-disable-next-line
+    if (this._isMounted) this.setState({ db: dbObj, ready: false });
+    if (dbObj == null && !isMount && onMountOrNull) onMountOrNull();
+
     let hit = false;
+    clearInterval(this.interval);
     this.interval = setInterval(() => {
       if (!this.state.db) return;
       if (Object.keys(this.remaining).length) return (hit = false);
@@ -48,6 +53,17 @@ class Provider extends React.Component {
         this.setState({ ready: true });
       }
     }, 15);
+  }
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    this.setDb(nextProps.db);
+  }
+  componentDidMount() {
+    this._isMounted = true;
+    const { onMountOrNull } = this.props;
+
+    if (onMountOrNull) onMountOrNull();
+    this.setDb(this.props.db, true);
   }
   componentWillUnmount() {
     const { onReadyOrUnmount } = this.props;
