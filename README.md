@@ -193,8 +193,8 @@ If you are adding this plugin while there's already a deployed system with data,
 Additionally, they have the properties:
 
 - `replicationStates`: An array of [`RxReplicationState`s](https://pubkey.github.io/rxdb/replication.html) for the synced collections of the database.
-- `active`: Boolean. A mobx observer indicating whether the replication is active. Will be `false` when there are connectivity problems.
-- `active$`: A TC39 observable stream. Same as `active`.
+- `alive`: Boolean. A mobx observer indicating whether the replication is alive. Will be `false` when there are connectivity problems.
+- `alive$`: A TC39 observable stream. Same as `alive`.
 
 ```javascript
 const dbPromise = RxDB.create({

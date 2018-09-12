@@ -72,11 +72,11 @@ class Replication {
     this._pReplicationStates = Promise.resolve([]);
     this._subscribers = [];
     this._states = [];
-    this._active = observable.box(false);
-    this.active$ = toStream(() => this._active.get());
+    this._alive = observable.box(false);
+    this.alive$ = toStream(() => this._alive.get());
   }
-  get active() {
-    return this._active.get();
+  get alive() {
+    return this._alive.get();
   }
   async connect() {
     await this.close();
@@ -106,7 +106,7 @@ class Replication {
     this._subscribers.forEach((x) => x.unsubscribe());
     this._subscribers = [];
     this._states = [];
-    this._checkActive();
+    this._checkAlive();
 
     await this._pReplicationStates.then((arr) => {
       return Promise.all(arr.map((x) => x.cancel()));
@@ -141,13 +141,13 @@ class Replication {
                 const eventEmitter = rep._pouchEventEmitterObject;
                 if (!eventEmitter) {
                   this._states[i] = false;
-                  return this._checkActive();
+                  return this._checkAlive();
                 }
 
                 this._states[i] =
                   eventEmitter.push.state !== 'stopped' &&
                   eventEmitter.pull.state !== 'stopped';
-                this._checkActive();
+                this._checkAlive();
               }, 150);
             })
           );
@@ -185,9 +185,9 @@ class Replication {
 
     if (remoteIsUrl) db.close();
   }
-  _checkActive() {
+  _checkAlive() {
     const set = (val) => {
-      if (this._active.get() !== val) this._active.set(val);
+      if (this._alive.get() !== val) this._alive.set(val);
     };
 
     if (!this._states.length) return set(false);

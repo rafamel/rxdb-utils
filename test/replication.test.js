@@ -42,9 +42,9 @@ describe(`- Basic setup`, () => {
     expect(typeof replication.close).toBe('function');
     expect(typeof replication.destroy).toBe('function');
     expect(Array.isArray(replication.replicationStates)).toBe(true);
-    expect(typeof replication.active).toBe('boolean');
-    expect(replication.active$).toHaveProperty('subscribe');
-    expect(typeof replication.active$.subscribe).toBe('function');
+    expect(typeof replication.alive).toBe('boolean');
+    expect(replication.alive$).toHaveProperty('subscribe');
+    expect(typeof replication.alive$.subscribe).toBe('function');
 
     await teardown(replication, dbPouch, db);
   });
