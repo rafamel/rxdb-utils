@@ -5,6 +5,21 @@ describe(`- RxCollection`, () => {
     expect.assertions(3);
 
     const db = await setup();
+    await db.collection({
+      ...model('items'),
+      methods: {},
+      statics: {}
+    });
+
+    expect(db.collections.items).not.toBe(undefined);
+    expect(db.collections.items.collections).not.toBe(undefined);
+    expect(typeof db.collections.items.collections).toBe('function');
+    await teardown(db);
+  });
+  test(`collection.collections exists (no statics, no methods)`, async () => {
+    expect.assertions(3);
+
+    const db = await setup();
     await db.collection(model('items'));
 
     expect(db.collections.items).not.toBe(undefined);

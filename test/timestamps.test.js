@@ -1,5 +1,19 @@
 import setup, { teardown, model } from './utils/db';
 
+test(`throws when there is no schema or no schema.properties`, async () => {
+  expect.assertions(2);
+
+  const db = await setup();
+  const data1 = model('items');
+  const data2 = model('items');
+  delete data1.schema;
+  delete data2.schema.properties;
+
+  await expect(db.collection(data1)).rejects.toThrow();
+  await expect(db.collection(data2)).rejects.toThrow();
+  await teardown(db);
+});
+
 test(`timestamps are not inserted when absent`, async () => {
   expect.assertions(2);
 

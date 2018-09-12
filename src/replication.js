@@ -38,7 +38,7 @@ export default {
     },
     preCreateRxCollection(model) {
       const name = model.name;
-      if (!name) throw Error('RxCollection(s) must have a name property');
+      if (!name) throw Error('RxCollection(s) must have a "name" property');
 
       if (!model.schema) model.schema = {};
       if (!model.schema.properties) model.schema.properties = {};

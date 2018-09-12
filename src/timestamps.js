@@ -32,12 +32,16 @@ export default {
   overwritable: {},
   hooks: {
     preCreateRxCollection(model) {
+      if (!model.schema || !model.schema.properties) {
+        throw Error(
+          'RxCollection(s) must have a a "schema" property, with a "properties" key'
+        );
+      }
+
       const timestamps = model && model.options && model.options.timestamps;
       if (!timestamps) return model;
 
       // Set schema
-      if (!model.schema) model.schema = {};
-      if (!model.schema.properties) model.schema.properties = {};
       model.schema.properties.createdAt = model.schema.properties.createdAt || {
         format: 'date-time',
         type: 'string'

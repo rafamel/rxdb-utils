@@ -15,7 +15,8 @@ export default {
             else {
               // Add collection arg to preInsert
               collection[hook](function(data) {
-                return hooks[hook](data, collection);
+                // eslint-disable-next-line babel/no-invalid-this
+                return hooks[hook].call(this, data, collection);
               });
             }
           });

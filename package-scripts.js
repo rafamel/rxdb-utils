@@ -22,8 +22,9 @@ module.exports = scripts({
     md: 'markdownlint *.md --config markdown.json'
   },
   test: {
-    default: 'nps lint.test && jest ./test/.*.test.js --runInBand',
-    watch: 'onchange "./{test,src}/*.{js,jsx}" -i -- nps private.test_watch'
+    default: 'nps lint.test && jest ./test/.*.test.js',
+    watch:
+      'onchange "./{test,src}/**/*.{js,jsx,ts}" -i -- nps private.test_watch'
   },
   validate: 'nps fix lint lint.test lint.md test private.validate_last',
   update: 'npm update --save/save-dev && npm outdated',

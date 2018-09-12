@@ -1,6 +1,44 @@
 import setup, { pouchSetup, teardown, model } from './utils/db';
 
 describe(`- Basic setup`, () => {
+  test(`throws when model doesn't have a name property`, async () => {
+    expect.assertions(1);
+
+    const db = await setup();
+    const data = model('items');
+    delete data.name;
+
+    await expect(db.collection(data)).rejects.toThrow();
+    await teardown(db);
+  });
+  test(`throws when a property is called rx_model`, async () => {
+    expect.assertions(1);
+
+    const db = await setup();
+    const data = model('items');
+    data.schema.properties.rx_model = {
+      type: 'string',
+      enum: ['items'],
+      default: 'some'
+    };
+
+    await expect(db.collection(data)).rejects.toThrow();
+    await teardown(db);
+  });
+  test(`doesn't throw when a property called rx_model has the same definition`, async () => {
+    expect.assertions(1);
+
+    const db = await setup();
+    const data = model('items');
+    data.schema.properties.rx_model = {
+      type: 'string',
+      enum: ['items'],
+      default: 'items'
+    };
+
+    await expect(db.collection(data)).resolves.toBeTruthy();
+    await teardown(db);
+  });
   test(`adds rx_model`, async () => {
     expect.assertions(1);
 
@@ -50,12 +88,35 @@ describe(`- Basic setup`, () => {
   });
 });
 
-describe(`- Basic sync`, () => {
+describe(`- Sync`, () => {
   test(`Sync works`, async () => {
     expect.assertions(3);
 
     const db = await setup();
     await db.collection(model('items'));
+
+    const dbPouch = pouchSetup();
+    const replication = db.replicate(dbPouch);
+    await replication.connect();
+
+    await db.collections.items.insert({ name: 'some' });
+    const item = await db.collections.items.findOne().exec();
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    expect(db.replications.length).toBe(1);
+    expect(replication.replicationStates.length).toBe(1);
+    await expect(dbPouch.get(item._id)).resolves.toHaveProperty('name', 'some');
+
+    await teardown(replication, dbPouch, db);
+  });
+  test(`Sync w/ keyCompression works`, async () => {
+    expect.assertions(3);
+
+    const db = await setup();
+    await db.collection({
+      ...model('items'),
+      disableKeyCompression: false
+    });
 
     const dbPouch = pouchSetup();
     const replication = db.replicate(dbPouch);
@@ -145,6 +206,9 @@ describe(`- Basic sync`, () => {
 
     await teardown(replication, dbPouch, db);
   });
+});
+
+describe(`- Functionality`, () => {
   test(`replication.close() closes the connection`, async () => {
     expect.assertions(2);
 

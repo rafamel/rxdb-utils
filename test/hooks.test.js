@@ -86,3 +86,60 @@ test(`all run`, async () => {
   expect(postRemove).toBe(true);
   await teardown(db);
 });
+
+test(`all are this bind to collection`, async () => {
+  expect.assertions(7);
+
+  let preInsert,
+    postInsert,
+    preSave,
+    postSave,
+    preRemove,
+    postRemove,
+    postCreate;
+
+  const db = await setup();
+  await db.collection({
+    ...model('items'),
+    options: {
+      hooks: {
+        preInsert() {
+          preInsert = this;
+        },
+        postInsert() {
+          postInsert = this;
+        },
+        preSave() {
+          preSave = this;
+        },
+        postSave() {
+          postSave = this;
+        },
+        preRemove() {
+          preRemove = this;
+        },
+        postRemove() {
+          postRemove = this;
+        },
+        postCreate() {
+          postCreate = this;
+        }
+      }
+    }
+  });
+
+  await db.collections.items.insert({ name: 'some' });
+  expect(preInsert).toHaveProperty('insert');
+  expect(postInsert).toHaveProperty('insert');
+  expect(postCreate).toHaveProperty('insert');
+
+  const item = await db.collections.items.findOne().exec();
+  await item.update({ $set: { name: 'other' } });
+  expect(preSave).toHaveProperty('insert');
+  expect(postSave).toHaveProperty('insert');
+
+  await item.remove();
+  expect(preRemove).toHaveProperty('insert');
+  expect(postRemove).toHaveProperty('insert');
+  await teardown(db);
+});
