@@ -1,9 +1,12 @@
 import * as RxDB from 'rxdb';
 import memory from 'pouchdb-adapter-memory';
+import http from 'pouchdb-adapter-http';
 import uuid from 'uuid/v4';
+import { spawn } from 'child_process';
 import registerUtils from '../../src';
 
 RxDB.plugin(memory);
+RxDB.plugin(http);
 registerUtils(RxDB);
 
 const nameGen = () => 'a' + uuid().replace(/[^a-zA-Z0-9]/g, '');
@@ -40,4 +43,17 @@ function teardown(...args) {
   return Promise.all(args.map((obj) => obj.destroy()));
 }
 
-export { setup as default, pouchSetup, teardown, model };
+function server() {
+  const cmd = /^win/.test(process.platform)
+    ? 'pouchdb-server.cmd'
+    : 'pouchdb-server';
+  const port = String(Math.floor(Math.random() * (5995 - 5005 + 1) + 5005));
+  const run = () => spawn(cmd, ['-p', port, '-m']);
+
+  return {
+    run,
+    url: `http://127.0.0.1:${port}/test`
+  };
+}
+
+export { setup as default, pouchSetup, server, teardown, model };

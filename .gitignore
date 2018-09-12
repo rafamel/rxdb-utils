@@ -1,6 +1,8 @@
 # Project Specific #
 ####################
 lib
+log.txt
+config.json
 
 # Node, Frameworks, Editors #
 #############################

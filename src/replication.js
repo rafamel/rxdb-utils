@@ -39,9 +39,12 @@ export default {
     preCreateRxCollection(model) {
       const name = model.name;
       if (!name) throw Error('RxCollection(s) must have a "name" property');
+      if (!model.schema || !model.schema.properties) {
+        throw Error(
+          'RxCollection(s) must have a a "schema" property, with a "properties" key'
+        );
+      }
 
-      if (!model.schema) model.schema = {};
-      if (!model.schema.properties) model.schema.properties = {};
       const rxModel = model.schema.properties.rx_model;
       if (rxModel && (rxModel.type !== 'string' || rxModel.default !== name)) {
         throw Error('Schema properties cannot be called "rx_model"');
