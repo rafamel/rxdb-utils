@@ -22,7 +22,7 @@ module.exports = scripts({
     md: 'markdownlint *.md --config markdown.json'
   },
   test: {
-    default: 'nps lint.test && jest ./test/.*.test.js --runInBand',
+    default: 'nps lint.test && jest ./test/.*.test.js',
     watch:
       'onchange "./{test,src}/**/*.{js,jsx,ts}" -i -- nps private.test_watch'
   },

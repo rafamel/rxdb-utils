@@ -1,6 +1,11 @@
 /* eslint-disable babel/no-invalid-this */
 import { computed, autorun, observable } from 'mobx';
-import { mobxSymbol, computedSymbol, currentSymbol } from './symbols';
+import {
+  subscribableSymbol,
+  mobxSymbol,
+  computedSymbol,
+  currentSymbol
+} from './symbols';
 import toMobx from './to-mobx';
 import uuid from 'uuid/v4';
 
@@ -24,18 +29,15 @@ export default function createDocument() {
 
   /* Make properties mobx observables */
   this[mobxSymbol] = {};
-  const subscriberKeys = Object.keys(
-    Object.getOwnPropertyDescriptors(this)
-  ).filter((x) => x.search(/^[^_].+\$$/) >= 0);
+  const toSubscribeKeys = this.collection[subscribableSymbol];
 
-  const subscriberGetters = subscriberKeys.reduce((acc, subscriberKey) => {
-    const key = subscriberKey.slice(0, -1);
+  const subscriberGetters = toSubscribeKeys.reduce((acc, key) => {
+    const subscriberKey = `${key}$`;
     acc[key] = {
       get: () => {
         if (!this[mobxSymbol][key]) {
           this[mobxSymbol][key] = toMobx(
             this[subscriberKey],
-            // TODO: test RxDocument._data contains properties on RxDB
             () => this._data[key]
           );
         }
@@ -57,8 +59,15 @@ export default function createDocument() {
     const properties = Object.entries(desc).filter(([_, { get }]) => get);
     const getters = properties.reduce((acc, [key, { get }]) => {
       this[computedSymbol][key] = computed(get.bind(this));
+      let lastVal;
       acc[key] = {
-        get: () => this[computedSymbol][key].get(),
+        get: () => {
+          try {
+            return (lastVal = this[computedSymbol][key].get());
+          } catch (e) {
+            return lastVal;
+          }
+        },
         enumerable: true
       };
       return acc;
@@ -87,7 +96,7 @@ export default function createDocument() {
             this[computedSymbol][key] = {
               get: () => {
                 const val = computedProperty.get()[currentSymbol]();
-                if (val === undefined) return lastVal;
+                if (val === undefined || val === null) return lastVal;
                 return (lastVal = val);
               }
             };

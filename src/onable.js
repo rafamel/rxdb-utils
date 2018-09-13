@@ -13,7 +13,7 @@ export function safe() {
 
 export function isOnable(obj) {
   if (!obj) return false;
-  return obj[currentSymbol] && true;
+  return !!obj[currentSymbol];
 }
 
 export function onable(parent, cbArr = []) {

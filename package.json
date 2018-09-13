@@ -71,9 +71,10 @@
     "nps": "^5.9.3",
     "npx": "^10.2.0",
     "onchange": "^4.1.0",
+    "pouchdb-adapter-memory": "^7.0.0",
     "prettier": "^1.14.2",
     "react": "^16.4.2",
-    "rxdb": "7.7.1",
+    "rxdb": "^8.0.0-beta.8",
     "rxjs": "^6.2.2",
     "shx": "^0.3.2"
   },
