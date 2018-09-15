@@ -132,7 +132,7 @@ describe(`- Sync`, () => {
     const db = await setup();
     await db.collection({
       ...model('items'),
-      disableKeyCompression: false
+      keyCompression: true
     });
 
     const dbPouch = pouchSetup();
