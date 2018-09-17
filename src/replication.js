@@ -58,7 +58,9 @@ export default {
   }
 };
 
-const isNotProduction = process.env.NODE_ENV !== 'production';
+const isDevelopment =
+  (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test') ||
+  process.env.NODE_ENV === 'development';
 class Replication {
   constructor(collections, remote, collectionNames, direction, options = {}) {
     this.remote = remote;
@@ -90,7 +92,7 @@ class Replication {
       return true;
     } catch (e) {
       // eslint-disable-next-line no-console
-      if (isNotProduction) console.error(e);
+      if (isDevelopment) console.error(e);
       this._interval = setInterval(() => {
         this._createFilter(this.remote)
           .then(() => {
@@ -98,7 +100,7 @@ class Replication {
             this._sync();
           })
           // eslint-disable-next-line no-console
-          .catch((e) => isNotProduction && console.error(e));
+          .catch((e) => isDevelopment && console.error(e));
       }, 5000);
       return false;
     }

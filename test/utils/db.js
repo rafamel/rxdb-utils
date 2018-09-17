@@ -43,12 +43,19 @@ function teardown(...args) {
   return Promise.all(args.map((obj) => obj.destroy()));
 }
 
+let waitFirstRun;
 function server() {
   const cmd = /^win/.test(process.platform)
     ? 'pouchdb-server.cmd'
     : 'pouchdb-server';
   const port = String(Math.floor(Math.random() * (5995 - 5005 + 1) + 5005));
-  const run = () => spawn(cmd, ['-p', port, '-m']);
+  const run = async () => {
+    if (!waitFirstRun) {
+      waitFirstRun = new Promise((resolve) => setTimeout(resolve, 10000));
+    }
+    await waitFirstRun;
+    return spawn(cmd, ['-p', port, '-m']);
+  };
 
   return {
     run,
