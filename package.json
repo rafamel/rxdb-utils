@@ -1,6 +1,6 @@
 {
   "name": "rxdb-mobx",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "author": "Rafa Mel",
   "description": "Mobx and React integration for RxDB",
   "keywords": [
