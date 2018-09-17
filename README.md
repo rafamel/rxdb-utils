@@ -20,7 +20,7 @@ It's required to have `rxdb@^8.0.0` installed in order to use `rxdb-utils`: `npm
 
 ## Setup
 
-`rxdb-utils` is comprised of a series of RxDB plugins to provide it with some missing functionality. You can see a usage example with React, along with [`rxdb-mobx`](https://www.npmjs.com/package/rxdb-mobx), [here](https://github.com/rafamel/rxdb-mobx/tree/master/example).
+`rxdb-utils` is comprised of a series of RxDB plugins to provide it with some missing functionality.
 
 You can either register them one by one - choosing only those you'd like to add, or register them all with `register()`;
 
