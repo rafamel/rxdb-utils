@@ -1,27 +1,31 @@
 # rxdb-mobx
 
-[![Version](https://img.shields.io/github/package-json/v/rafamel/rxdb-mobx.svg)](https://github.com/rafamel/rxdb-mobx)
+<!-- [![Version](https://img.shields.io/github/package-json/v/rafamel/rxdb-mobx.svg)](https://github.com/rafamel/rxdb-mobx)
 [![Build Status](https://travis-ci.org/rafamel/rxdb-mobx.svg)](https://travis-ci.org/rafamel/rxdb-mobx)
 [![Coverage](https://img.shields.io/coveralls/rafamel/rxdb-mobx.svg)](https://coveralls.io/github/rafamel/rxdb-mobx)
 [![Dependencies](https://david-dm.org/rafamel/rxdb-mobx/status.svg)](https://david-dm.org/rafamel/rxdb-mobx)
 [![Vulnerabilities](https://snyk.io/test/npm/rxdb-mobx/badge.svg)](https://snyk.io/test/npm/rxdb-mobx)
 [![Issues](https://img.shields.io/github/issues/rafamel/rxdb-mobx.svg)](https://github.com/rafamel/rxdb-mobx/issues)
-[![License](https://img.shields.io/github/license/rafamel/rxdb-mobx.svg)](https://github.com/rafamel/rxdb-mobx/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/rafamel/rxdb-mobx.svg)](https://github.com/rafamel/rxdb-mobx/blob/master/LICENSE) -->
 
 <!-- markdownlint-disable MD036 -->
 **Mobx and React integration for RxDB**
 <!-- markdownlint-enable MD036 -->
 
-## Install
+## EXPERIMENTAL
 
-[`npm install rxdb-mobx`](https://www.npmjs.com/package/rxdb-mobx)
+**This library is a proof of concept.** It has never been published on [npm](https://www.npmjs.com/) and probably never will. Your best bet is to pair `rxdb` with `rxjs` and [`recompose`](https://www.npmjs.com/package/recompose) for React integration -an additional mobx layer over RxDB will cause you more headaches than anything else. Because of the async nature of RxDB, working with mobx reasonably causes functions to rerun and components to rerender often as new values arrive with slight time differences, as there is no manual control of the subscriptions flow -as you would have with `rxjs`. This is particularly noticeable with relationships, and even problematic when remote replication is active, when on the receiving end.
+
+That being said, at the moment of publishing this, the library is usable, though there are some rough edges, particularly with collection relationships. I'll probably also take the time to bring native computed properties over to RxDB.
+
+## Install
 
 * It's required to have `mobx` and `rxdb@^8.0.0` installed in order to use `rxdb-mobx`: `npm install mobx rxdb`.
 * It's required to have `react` and `mobx-react` installed in order to use `rxdb-mobx` integrations with React: `npm install react mobx-react`.
 
 ## Setup
 
-`mobx-react` is a RxDB plugin, so it should be registered just as any other.
+`rxdb-mobx` is a RxDB plugin, so it should be registered just as any other.
 
 ```javascript
 import * as RxDB from 'rxdb';
@@ -159,3 +163,7 @@ Allows you to access the `db` within the `Provider` context.
 #### select(callback, onMount, onReadyOrUnmount)(Component)
 
 Will only mount after the db promise is resolved. Will only display the components once all the children data is ready for the first time.
+
+## TODO
+
+* Document `Provider`, `withDB`, and `select`.
