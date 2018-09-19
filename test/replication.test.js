@@ -1,6 +1,5 @@
 import setup, { pouchSetup, server, teardown, model } from './utils/db';
 import { PouchDB } from 'rxdb';
-import { autorun } from 'mobx';
 import asyncUtil from 'async-test-util';
 
 jest.setTimeout(20000);
@@ -336,7 +335,7 @@ describe(`- Remote sync`, () => {
     proc.kill('SIGINT');
   });
   test(`Alive subscriptions work`, async () => {
-    expect.assertions(7);
+    expect.assertions(4);
 
     const { run, url } = server();
 
@@ -347,28 +346,22 @@ describe(`- Remote sync`, () => {
     await replication.connect();
 
     let aliveS = false;
-    let aliveM = false;
     const subscription = replication.alive$.subscribe(
       (state) => (aliveS = state)
     );
-    const disposer = autorun(() => (aliveM = replication.alive));
-    await asyncUtil.waitUntil(() => !aliveS && !aliveM);
+    await asyncUtil.waitUntil(() => !aliveS);
 
     expect(subscription).toHaveProperty('unsubscribe');
     expect(typeof subscription.unsubscribe).toBe('function');
-    expect(typeof disposer).toBe('function');
     expect(aliveS).toBe(false);
-    expect(aliveM).toBe(false);
 
     const proc = await run();
     // Connection recovery interval is 5s
-    await asyncUtil.waitUntil(() => aliveS && aliveM);
+    await asyncUtil.waitUntil(() => aliveS);
 
     expect(aliveS).toBe(true);
-    expect(aliveM).toBe(true);
 
     subscription.unsubscribe();
-    disposer();
     await teardown(replication, db);
     proc.kill('SIGINT');
   });

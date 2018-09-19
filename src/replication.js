@@ -1,6 +1,5 @@
 import { PouchDB } from 'rxdb';
-import { observable } from 'mobx';
-import { toStream } from 'mobx-utils';
+import { BehaviorSubject } from 'rxjs';
 import keyCompression from 'rxdb/plugins/key-compression';
 
 export default {
@@ -77,11 +76,11 @@ class Replication {
     this._pReplicationStates = Promise.resolve([]);
     this._subscribers = [];
     this._states = [];
-    this._alive = observable.box(false);
-    this.alive$ = toStream(() => this._alive.get());
+    this.alive = false;
+    this._aliveSubject = new BehaviorSubject(false);
   }
-  get alive() {
-    return this._alive.get();
+  get alive$() {
+    return this._aliveSubject.asObservable();
   }
   async connect() {
     await this.close();
@@ -111,7 +110,11 @@ class Replication {
     this._subscribers.forEach((x) => x.unsubscribe());
     this._subscribers = [];
     this._states = [];
-    this._checkAlive();
+
+    if (this.alive) {
+      this.alive = false;
+      this._aliveSubject.next(false);
+    }
 
     await this._pReplicationStates.then((arr) => {
       return Promise.all(arr.map((x) => x.cancel()));
@@ -137,23 +140,22 @@ class Replication {
       });
     });
 
+    const allAlive = promises.map(() => false);
     this._pReplicationStates = Promise.all(promises)
       .then((arr) => {
         arr.forEach((rep, i) => {
           this._subscribers.push(
-            rep.active$.subscribe(() => {
-              setTimeout(() => {
-                const eventEmitter = rep._pouchEventEmitterObject;
-                if (!eventEmitter) {
-                  this._states[i] = false;
-                  return this._checkAlive();
-                }
+            rep.alive$.subscribe((val) => {
+              const repAlive = allAlive[i];
 
-                this._states[i] =
-                  eventEmitter.push.state !== 'stopped' &&
-                  eventEmitter.pull.state !== 'stopped';
-                this._checkAlive();
-              }, 150);
+              if (repAlive === val) return;
+
+              allAlive[i] = val;
+              const alive = allAlive.reduce((acc, x) => acc & x, true);
+
+              if (alive === this.alive) return;
+              this.alive = alive;
+              this._aliveSubject.next(val);
             })
           );
         });
@@ -189,17 +191,5 @@ class Replication {
       .catch(() => db.put(doc));
 
     if (remoteIsUrl) db.close();
-  }
-  _checkAlive() {
-    const set = (val) => {
-      if (this._alive.get() !== val) this._alive.set(val);
-    };
-
-    if (!this._states.length) return set(false);
-
-    for (let i = 0; i < this._states.length; i++) {
-      if (!this._states[i]) return set(false);
-    }
-    set(true);
   }
 }

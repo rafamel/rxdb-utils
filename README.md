@@ -16,7 +16,7 @@
 
 [`npm install rxdb-utils`](https://www.npmjs.com/package/rxdb-utils)
 
-It's required to have `rxdb@^8.0.0` installed in order to use `rxdb-utils`: `npm install rxdb`.
+It's required to have `rxdb@^8.0.0` and `rxjs@^6.0.0` installed in order to use `rxdb-utils`: `npm install rxdb rxjs`.
 
 ## Setup
 
@@ -25,8 +25,6 @@ It's required to have `rxdb@^8.0.0` installed in order to use `rxdb-utils`: `npm
 You can either register them one by one - choosing only those you'd like to add, or register them all with `register()`;
 
 ### Register all plugins
-
-Keep in mind you also need to have `mobx` installed in order to use the `replication` plugin: `npm install mobx`
 
 ```javascript
 import * as RxDB from 'rxdb';
@@ -168,8 +166,6 @@ db.collection({
 
 ### replication
 
-You need to have `mobx` installed in order to use the `replication` plugin: `npm install mobx`.
-
 Will allow for filtered replication of collections to a single remote instance. This would allow you to use a single remote pouchdb/couchdb database (per user, if applicable) to save all collections, instead of using one remote instance per user and collection.
 
 In order to achieve so, all schemas will be modified by adding an `rx_model` property to all collections, which will be populated for all documents with the name of the collection. The key for this property will not change even if you activate key compression.
@@ -193,8 +189,8 @@ If you are adding this plugin while there's already a deployed system with data,
 Additionally, they have the properties:
 
 - `replicationStates`: An array of [`RxReplicationState`s](https://pubkey.github.io/rxdb/replication.html) for the synced collections of the database.
-- `alive`: Boolean. A mobx observer indicating whether the replication is alive. Will be `false` when there are connectivity problems.
-- `alive$`: A TC39 observable stream. Same as `alive`.
+- `alive`: Boolean. Indicates whether the replication is alive. Will be `false` when there are connectivity problems.
+- `alive$`: A RxJS observable stream. Same as `alive`.
 
 ```javascript
 const dbPromise = RxDB.create({
