@@ -1,7 +1,14 @@
 log.txt
 config.json
+_test.js
 src
 test
-_test.js
+.cache
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+coverage
 *.log
 DS_Store
