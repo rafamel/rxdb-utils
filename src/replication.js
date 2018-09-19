@@ -151,11 +151,11 @@ class Replication {
               if (repAlive === val) return;
 
               allAlive[i] = val;
-              const alive = allAlive.reduce((acc, x) => acc & x, true);
+              const alive = allAlive.reduce((acc, x) => acc && x, true);
 
               if (alive === this.alive) return;
               this.alive = alive;
-              this._aliveSubject.next(val);
+              this._aliveSubject.next(alive);
             })
           );
         });
