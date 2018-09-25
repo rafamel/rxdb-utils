@@ -16,9 +16,10 @@
   "main": "./lib/index.js",
   "scripts": {
     "precommit": "cross-env MSG=\"Committing in:\" nps validate",
-    "prepublishOnly": "nps build",
+    "prepublishOnly": "exit 1",
     "start": "npm run watch",
     "build": "nps build",
+    "publish": "nps publish",
     "watch": "nps watch",
     "fix": "nps fix",
     "lint": "nps lint",
