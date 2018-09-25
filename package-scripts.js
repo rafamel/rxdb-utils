@@ -31,7 +31,7 @@ module.exports = scripts({
   clean: `${exit0('shx rm -r lib coverage')} && shx rm -rf node_modules`,
   // Private
   private: {
-    watch: `${sx('clear')} && nps lint`,
+    watch: `${sx('clear')} && nps lint && babel src --out-dir lib`,
     test_watch: `${sx('clear')} && nps test`,
     validate_last: `npm outdated || ${sx('countdown')}`
   }
