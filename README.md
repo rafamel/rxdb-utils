@@ -42,6 +42,7 @@ import * as RxDB from 'rxdb';
 import memory from 'pouchdb-adapter-memory';
 import models from 'rxdb-utils/models';
 import collections from 'rxdb-utils/collections';
+import views from 'rxdb-utils/views';
 import defaultValues from 'rxdb-utils/default-values';
 import timestamps from 'rxdb-utils/timestamps';
 import hooks from 'rxdb-utils/hooks';
@@ -53,6 +54,7 @@ RxDB.plugin(memory);
 // Registering rxdb-utils plugins one by one
 RxDB.plugin(models);
 RxDB.plugin(collections);
+RxDB.plugin(views);
 RxDB.plugin(defaultValues);
 RxDB.plugin(timestamps);
 RxDB.plugin(hooks);
@@ -96,6 +98,10 @@ const dbPromise = RxDB.create({
 ### collections
 
 Will make available a `collections()` method for both `RxCollection` and `RxDocument`. This is just a matter of convenience, as database collections are by default accesible on the path `this.database.collections` on collections, and `this.collection.database.collections` on documents.
+
+### views
+
+TODO
 
 ### defaultValues
 
