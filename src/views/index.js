@@ -1,12 +1,14 @@
-import createGetter from './create-getter';
-
-const SYMBOL = Symbol('observables');
+import RxQuery from './rx-query';
+import RxDocument from './rx-document';
+import { OBSERVABLES_SYMBOL } from './constants';
 
 // TODO: Documentation
 // TODO: test
 export default {
   rxdb: true,
-  prototypes: {},
+  prototypes: {
+    RxQuery
+  },
   overwritable: {},
   hooks: {
     createRxCollection(collection) {
@@ -14,25 +16,15 @@ export default {
       if (!options || !options.views) return;
 
       const desc = Object.getOwnPropertyDescriptors(options.views);
-      const properties = Object.entries(desc).filter(([_, { get }]) => get);
-      const getters = properties.reduce((acc, [key, { get }]) => {
-        acc[key] = {
-          get() {
-            if (!this[SYMBOL][key]) {
-              this[SYMBOL][key] = createGetter.call(this, get);
-            }
-            return this[SYMBOL][key];
-          },
-          enumerable: true
-        };
-        return acc;
-      }, {});
+      const views = Object.entries(desc).filter(([_, { get }]) => get);
+      // Views keys live on collection._views
+      collection._views = views.map(([key]) => key);
 
       const proto = collection.getDocumentPrototype();
-      Object.defineProperties(proto, getters);
+      return RxDocument(proto, views);
     },
     postCreateRxDocument(doc) {
-      doc[SYMBOL] = {};
+      doc[OBSERVABLES_SYMBOL] = {};
     }
   }
 };

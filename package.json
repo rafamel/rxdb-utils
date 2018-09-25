@@ -82,7 +82,11 @@
     "rxdb": "^8.0.0",
     "rxjs": "^6.0.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "lodash.flattendeep": "^4.4.0",
+    "lodash.merge": "^4.6.1",
+    "object-hash": "^1.3.0"
+  },
   "jest": {
     "testEnvironment": "node",
     "collectCoverage": true,

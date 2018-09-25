@@ -40,6 +40,7 @@ register(RxDB); // Registering all plugins provided by rxdb-utils
 ```javascript
 import * as RxDB from 'rxdb';
 import memory from 'pouchdb-adapter-memory';
+// rxdb-utils imports
 import models from 'rxdb-utils/models';
 import collections from 'rxdb-utils/collections';
 import defaultValues from 'rxdb-utils/default-values';
