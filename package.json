@@ -93,7 +93,7 @@
       "src/**/*.{js,ts,jsx}"
     ],
     "modulePathIgnorePatterns": [
-      "<rootDir>/lib/package.json"
+      "<rootDir>/lib"
     ]
   }
 }
