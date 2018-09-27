@@ -14,9 +14,13 @@
 
 ## EXPERIMENTAL
 
-**This library is a proof of concept.** It has never been published on [npm](https://www.npmjs.com/) and probably never will. Your best bet is to pair `rxdb` with `rxjs` and [`recompose`](https://www.npmjs.com/package/recompose) for React integration -an additional mobx layer over RxDB will cause you more headaches than anything else. Because of the async nature of RxDB, working with mobx reasonably causes functions to rerun and components to rerender often as new values arrive with slight time differences, as there is no manual control of the subscriptions flow -as you would have with `rxjs`. This is particularly noticeable with relationships, and even problematic when remote replication is active, when on the receiving end.
+**This library is a proof of concept.** It has never been published on [npm](https://www.npmjs.com/) and probably never will. Your best bet is to pair `rxdb` with the *views* and *observables* plugins from [`rxdb-utils`](https://github.com/rafamel/rxdb-utils) instead, and use [`proppy-extend`](https://github.com/rafamel/proppy-extend)'s (you'll need [`proppy`](https://proppyjs.com/)) *withObservable* and *withStream* for React integration. You might also want to take a look at [rxjs-utils](https://github.com/rafamel/rxjs-utils).
+
+An additional mobx layer over RxDB will cause you more headaches than anything else. Because of the async nature of RxDB, working with mobx reasonably causes functions to rerun and components to rerender often as new values arrive with slight time differences, as there is no manual control of the subscriptions flow -as you would have with `rxjs`. This is particularly noticeable with relationships, and even problematic when remote replication is active, when on the receiving end.
 
 That being said, at the moment of publishing this, the library is usable, though there are some rough edges, particularly with collection relationships. I'll probably also take the time to bring native computed properties over to RxDB.
+
+**TLDR: Don't use this library. Use the *views* and *observables* plugins from [`rxdb-utils`](https://github.com/rafamel/rxdb-utils) instead, and [`proppy-extend`](https://github.com/rafamel/proppy-extend)'s (you'll need [`proppy`](https://proppyjs.com/)) *withObservable* and *withStream* for React integration.**
 
 ## Install
 
