@@ -19,6 +19,26 @@ test(`preInsert runs`, async () => {
   await teardown(db);
 });
 
+test(`preInsert runs for inMemory`, async () => {
+  expect.assertions(1);
+
+  let run;
+  const db = await setup();
+  const collection = await db.collection({
+    ...model('items'),
+    options: {
+      hooks: {
+        preInsert: (data) => (run = true)
+      }
+    }
+  });
+  const inMemCollection = await collection.inMemory();
+  await inMemCollection.insert({});
+
+  expect(run).toBe(true);
+  await teardown(db);
+});
+
 test(`preInsert receives data and collection`, async () => {
   expect.assertions(4);
 
@@ -141,5 +161,28 @@ test(`all are this bind to collection`, async () => {
   await item.remove();
   expect(preRemove).toHaveProperty('insert');
   expect(postRemove).toHaveProperty('insert');
+  await teardown(db);
+});
+
+test(`postInsert is bind to inMemory collection`, async () => {
+  expect.assertions(1);
+
+  let postInsert;
+  const db = await setup();
+  const collection = await db.collection({
+    ...model('items'),
+    options: {
+      hooks: {
+        postInsert() {
+          postInsert = this;
+        }
+      }
+    }
+  });
+
+  const inMemCollection = await collection.inMemory();
+  await inMemCollection.insert({ name: 'some' });
+  expect(typeof postInsert.insert).toBe('function');
+
   await teardown(db);
 });

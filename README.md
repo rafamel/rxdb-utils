@@ -157,6 +157,8 @@ TODO
 
 Allows to set up hooks within the collection definition. There is an obvious limitation, in that registering hooks with the native RxDB api will allow a more finegrained control over their execution. However, in the occasions this is not needed, it is rather convenient to have a straightforwards way of defining them. Additionally, `pre` hooks will receive the collection object as their second argument.
 
+Hooks defined this way **will also be inherited by *inMemory* collections.**
+
 ```javascript
 db.collection({
   name: 'item',
