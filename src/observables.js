@@ -1,7 +1,5 @@
-import { from } from 'rxjs';
-import { map, take, switchMap } from 'rxjs/operators';
-
-// TODO test
+import { from, of as observableOf } from 'rxjs';
+import { take, switchMap } from 'rxjs/operators';
 
 export default {
   rxdb: true,
@@ -28,12 +26,10 @@ export default {
 
             let piping;
             if (get) {
-              piping =
-                get.constructor.name === 'AsyncFunction'
-                  ? // eslint-disable-next-line babel/no-invalid-this
-                    switchMap((obj) => from(get.call(this, obj)))
-                  : // eslint-disable-next-line babel/no-invalid-this
-                    map((obj) => get.call(this, obj));
+              piping = switchMap((obj) => {
+                const res = get.call(this, obj);
+                return res.then ? from(res) : observableOf(res);
+              });
             }
             return {
               $: get ? obs.pipe(piping) : obs,
@@ -51,7 +47,7 @@ export default {
           acc[key] = {
             get() {
               const method = observableMethod.bind(this);
-              method.get = get;
+              method.get = get ? get.bind(this) : undefined;
               return method;
             },
             enumerable: true
