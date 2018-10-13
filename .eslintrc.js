@@ -26,5 +26,11 @@ module.exports = {
     'babel/semi': 1,
     // Prettier
     'prettier/prettier': [2, require('./.prettierrc')]
+  },
+  settings: {
+    // babel-plugin-module-resolver
+    'import/resolver': {
+      'babel-module': {}
+    }
   }
 };
