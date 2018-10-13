@@ -1,5 +1,5 @@
 import uuid from 'uuid/v4';
-import { take } from 'rxjs/operators';
+import { take, tap } from 'rxjs/operators';
 import createSubject from './create-subject';
 import { OBSERVABLES_SYMBOL, ENSURE_SYMBOL } from './constants';
 
@@ -47,6 +47,7 @@ function createView(getObs) {
   let ensuredIds = {};
   let ensured = false;
   let observable;
+  let value;
   Object.defineProperties(obj, {
     [ENSURE_SYMBOL]: {
       value: function ensure() {
@@ -70,10 +71,16 @@ function createView(getObs) {
     $: {
       get() {
         if (!observable) {
-          const obs = getObs();
+          const obs = getObs().pipe(tap((res) => obj.ensured && (value = res)));
           observable = createSubject(obs, { keepOpenCheck: () => obj.ensured });
         }
         return observable;
+      },
+      enumerable: true
+    },
+    promise: {
+      get() {
+        return obj.$.pipe(take(1)).toPromise();
       },
       enumerable: true
     },
@@ -82,6 +89,17 @@ function createView(getObs) {
         return getObs()
           .pipe(take(1))
           .toPromise();
+      },
+      enumerable: true
+    },
+    value: {
+      get() {
+        if (!obj.ensured) {
+          throw Error(
+            'Tried to get an view value for RxDocument not part of an ensure$() query'
+          );
+        }
+        return value;
       },
       enumerable: true
     }

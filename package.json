@@ -95,7 +95,7 @@
       "src/**/*.{js,ts,jsx}"
     ],
     "modulePathIgnorePatterns": [
-      "<rootDir>/lib"
+      "<rootDir>/build"
     ]
   }
 }

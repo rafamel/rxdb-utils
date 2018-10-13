@@ -2,7 +2,6 @@ import RxQuery from './rx-query';
 import RxDocument from './rx-document';
 import { OBSERVABLES_SYMBOL } from './constants';
 
-// TODO: Documentation
 // TODO: test
 export default {
   rxdb: true,

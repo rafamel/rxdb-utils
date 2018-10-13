@@ -1,6 +1,6 @@
-import { map, take } from 'rxjs/operators';
+import { from } from 'rxjs';
+import { map, take, switchMap } from 'rxjs/operators';
 
-// TODO document
 // TODO test
 
 export default {
@@ -24,16 +24,24 @@ export default {
 
           function observableMethod(...args) {
             // eslint-disable-next-line babel/no-invalid-this
-            const subs = $.apply(this, args);
+            const obs = $.apply(this, args);
+
+            let piping;
+            if (get) {
+              piping =
+                get.constructor.name === 'AsyncFunction'
+                  ? // eslint-disable-next-line babel/no-invalid-this
+                    switchMap((obj) => from(get.call(this, obj)))
+                  : // eslint-disable-next-line babel/no-invalid-this
+                    map((obj) => get.call(this, obj));
+            }
             return {
-              // eslint-disable-next-line babel/no-invalid-this
-              $: get ? subs.pipe(map((obj) => get.call(this, obj))) : subs,
+              $: get ? obs.pipe(piping) : obs,
               exec: () => {
-                return subs
+                return obs
                   .pipe(
                     take(1),
-                    // eslint-disable-next-line babel/no-invalid-this
-                    get ? map((obj) => get.call(this, obj)) : (x) => x
+                    get ? piping : (x) => x
                   )
                   .toPromise();
               }

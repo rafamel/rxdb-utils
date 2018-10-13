@@ -1,11 +1,9 @@
-import * as Rx from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { ReplaySubject, Observable } from 'rxjs';
 import {
   CLOSE_SUBSCRIPTION_TIMEOUT,
   CHECK_KEEP_OPEN_TIMEOUT
 } from './constants';
 
-const INIT_VAL = {};
 export default function createSubject(observable, opts = {}) {
   let options = {
     keepOpenCheck: () => false,
@@ -18,9 +16,7 @@ export default function createSubject(observable, opts = {}) {
   let subscription;
   const lifecycle = {
     init() {
-      subject = new Rx.BehaviorSubject(INIT_VAL).pipe(
-        filter((x) => x !== INIT_VAL)
-      );
+      subject = new ReplaySubject(1);
       subscription = observable.subscribe(subject);
       options.onInit();
     },
@@ -42,7 +38,7 @@ export default function createSubject(observable, opts = {}) {
   let subscriptions = 0;
   let isAlive = false;
   let interval;
-  return Rx.Observable.create((obs) => {
+  return Observable.create((obs) => {
     subscriptions++;
     clearInterval(interval);
     if (!isAlive) (isAlive = true) && lifecycle.init();
