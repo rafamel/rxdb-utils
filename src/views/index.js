@@ -2,7 +2,6 @@ import RxQuery from './rx-query';
 import RxDocument from './rx-document';
 import { OBSERVABLES_SYMBOL } from './constants';
 
-// TODO: test
 export default {
   rxdb: true,
   prototypes: {
@@ -20,7 +19,7 @@ export default {
       collection._views = views.map(([key]) => key);
 
       const proto = collection.getDocumentPrototype();
-      return RxDocument(proto, views);
+      RxDocument(proto, views);
     },
     postCreateRxDocument(doc) {
       doc[OBSERVABLES_SYMBOL] = {};

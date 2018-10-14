@@ -8,6 +8,11 @@ import { ENSURE_CLEANUP_TIMEOUT, ENSURE_SYMBOL } from './constants';
 export default function RxQuery(proto) {
   Object.assign(proto, {
     ensure$(...properties) {
+      if (!this.collection.options || !this.collection.options.views) {
+        throw Error(
+          'RxQuery.ensure$() can only be used on collection with defined views'
+        );
+      }
       properties = flattenDeep(properties);
       if (!properties.length) properties = this.collection._views;
 
@@ -58,6 +63,7 @@ function createEnsure(observable, properties) {
 
   let interval;
   let lastCleanupDocs;
+
   return createSubject(obs, {
     onInit() {
       // Periodic cleanup of ensured docs that are not part of the

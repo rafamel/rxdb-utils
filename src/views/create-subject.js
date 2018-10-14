@@ -62,6 +62,7 @@ export default function createSubject(observable, opts = {}) {
 
         if (!options.keepOpenCheck()) kill();
         else {
+          clearInterval(interval);
           interval = setInterval(() => {
             if (subscriptions || !isAlive) return clearInterval(interval);
             if (!options.keepOpenCheck()) kill();
