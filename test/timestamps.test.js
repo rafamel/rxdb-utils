@@ -9,8 +9,8 @@ test(`throws when there is no schema or no schema.properties`, async () => {
   delete data1.schema;
   delete data2.schema.properties;
 
-  await expect(db.collection(data1)).rejects.toThrow();
-  await expect(db.collection(data2)).rejects.toThrow();
+  await expect(db.collection(data1)).rejects.toThrowError();
+  await expect(db.collection(data2)).rejects.toThrowError();
   await teardown(db);
 });
 

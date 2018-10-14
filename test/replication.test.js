@@ -12,7 +12,7 @@ describe(`- Basic setup`, () => {
     const data = model('items');
     delete data.name;
 
-    await expect(db.collection(data)).rejects.toThrow();
+    await expect(db.collection(data)).rejects.toThrowError();
     await teardown(db);
   });
   test(`throws when there is no schema or no schema.properties`, async () => {
@@ -24,8 +24,8 @@ describe(`- Basic setup`, () => {
     delete data1.schema;
     delete data2.schema.properties;
 
-    await expect(db.collection(data1)).rejects.toThrow();
-    await expect(db.collection(data2)).rejects.toThrow();
+    await expect(db.collection(data1)).rejects.toThrowError();
+    await expect(db.collection(data2)).rejects.toThrowError();
     await teardown(db);
   });
   test(`throws when a property is called rx_model`, async () => {
@@ -39,7 +39,7 @@ describe(`- Basic setup`, () => {
       default: 'some'
     };
 
-    await expect(db.collection(data)).rejects.toThrow();
+    await expect(db.collection(data)).rejects.toThrowError();
     await teardown(db);
   });
   test(`doesn't throw when a property called rx_model has the same definition`, async () => {
@@ -224,7 +224,7 @@ describe(`- Sync`, () => {
     await asyncUtil.waitUntil(() => dbPouch.get(item._id).catch(() => false));
 
     await expect(dbPouch.get(item._id)).resolves.toHaveProperty('name', 'some');
-    await expect(dbPouch.get(element._id)).rejects.toThrow();
+    await expect(dbPouch.get(element._id)).rejects.toThrowError();
 
     await teardown(replication, dbPouch, db);
   });
@@ -252,7 +252,7 @@ describe(`- Functionality`, () => {
     );
 
     expect(db.replications.length).toBe(1);
-    await expect(dbPouch.get(item._id)).rejects.toThrow();
+    await expect(dbPouch.get(item._id)).rejects.toThrowError();
 
     await teardown(replication, dbPouch, db);
   });
@@ -277,7 +277,7 @@ describe(`- Functionality`, () => {
     );
 
     expect(db.replications.length).toBe(0);
-    await expect(dbPouch.get(item._id)).rejects.toThrow();
+    await expect(dbPouch.get(item._id)).rejects.toThrowError();
 
     await teardown(dbPouch, db);
   });

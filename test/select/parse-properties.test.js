@@ -65,9 +65,9 @@ describe(`objects`, () => {
 
 describe(`throws`, () => {
   test(`input is not array`, () => {
-    expect(() => parseProperties('string')).toThrow();
+    expect(() => parseProperties('string')).toThrowError();
   });
   test(`property is not string/object/array`, () => {
-    expect(() => parseProperties([() => {}])).toThrow();
+    expect(() => parseProperties([() => {}])).toThrowError();
   });
 });

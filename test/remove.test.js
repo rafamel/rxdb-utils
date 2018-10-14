@@ -10,6 +10,6 @@ test(`RxDocument.remove() doesn't throw after removal`, async () => {
 
   await item.remove();
 
-  await expect(item.remove()).rejects.toThrow();
+  await expect(item.remove()).rejects.toThrowError();
   await teardown(db);
 });
