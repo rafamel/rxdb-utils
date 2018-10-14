@@ -27,6 +27,7 @@ export default {
             let piping;
             if (get) {
               piping = switchMap((obj) => {
+                // eslint-disable-next-line babel/no-invalid-this
                 const res = get.call(this, obj);
                 return res.then ? from(res) : observableOf(res);
               });

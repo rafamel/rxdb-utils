@@ -26,6 +26,7 @@ function parseString(str) {
 }
 
 export default function parseProperties(propertiesArr) {
+  if (!Array.isArray(propertiesArr)) throw Error('invalid properties');
   propertiesArr = flattenDeep(propertiesArr);
 
   let properties = {};

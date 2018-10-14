@@ -18,13 +18,16 @@ export default function RxDocument(proto) {
             ).pipe(
               map((all) => ({
                 ...all[0],
-                ...viewsKeys.reduce((acc, key, i) => {
-                  acc[key] = all[i + 1];
-                  return acc;
-                }, {})
+                ...viewsKeys.reduce(
+                  (acc, key, i) => {
+                    acc[key] = all[i + 1];
+                    return acc;
+                  },
+                  { _: this }
+                )
               }))
             )
-          : this.$;
+          : this.$.pipe(map((res) => ({ ...res, _: this })));
       }
 
       // Properties specified, parse
