@@ -1,5 +1,5 @@
 import { PouchDB } from 'rxdb';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import keyCompression from 'rxdb/plugins/key-compression';
 
 export default {
@@ -78,9 +78,13 @@ class Replication {
     this._states = [];
     this.alive = false;
     this._aliveSubject = new BehaviorSubject(false);
+    this._errorSubject = new Subject();
   }
   get alive$() {
     return this._aliveSubject.asObservable();
+  }
+  get error$() {
+    return this._errorSubject.asObservable();
   }
   async connect() {
     await this.close();
@@ -91,7 +95,7 @@ class Replication {
       return true;
     } catch (e) {
       // eslint-disable-next-line no-console
-      if (isDevelopment) console.error(e);
+      this._errorSubject.next(e);
       this._interval = setInterval(() => {
         this._createFilter(this.remote)
           .then(() => {
@@ -99,7 +103,7 @@ class Replication {
             this._sync();
           })
           // eslint-disable-next-line no-console
-          .catch((e) => isDevelopment && console.error(e));
+          .catch((e) => this._errorSubject.next(e));
       }, 5000);
       return false;
     }
