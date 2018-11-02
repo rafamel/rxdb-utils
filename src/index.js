@@ -9,6 +9,7 @@ import remove from './remove';
 import hooks from './hooks';
 import replication from './replication';
 
+export { loglevel, loglevels } from './logger';
 export default function register(RxDB) {
   RxDB.plugin(models);
   RxDB.plugin(collections);

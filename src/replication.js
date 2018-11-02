@@ -1,6 +1,7 @@
 import { PouchDB } from 'rxdb';
 import { BehaviorSubject } from 'rxjs';
 import keyCompression from 'rxdb/plugins/key-compression';
+import logger from '~/logger';
 
 export default {
   rxdb: true,
@@ -57,9 +58,6 @@ export default {
   }
 };
 
-const isDevelopment =
-  (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test') ||
-  process.env.NODE_ENV === 'development';
 class Replication {
   constructor(collections, remote, collectionNames, direction, options = {}) {
     this.remote = remote;
@@ -90,16 +88,14 @@ class Replication {
       await this._sync();
       return true;
     } catch (e) {
-      // eslint-disable-next-line no-console
-      if (isDevelopment) console.error(e);
+      logger.error(e);
       this._interval = setInterval(() => {
         this._createFilter(this.remote)
           .then(() => {
             clearInterval(this._interval);
             this._sync();
           })
-          // eslint-disable-next-line no-console
-          .catch((e) => isDevelopment && console.error(e));
+          .catch((e) => logger.error(e));
       }, 5000);
       return false;
     }
@@ -134,6 +130,7 @@ class Replication {
           ...this.options,
           live: this.options.live || true,
           retry: this.options.retry || true,
+          // selector: { rx_model: name }
           filter: 'app/by_model',
           query_params: { rx_model: name }
         }
