@@ -2,6 +2,7 @@ import * as RxDB from 'rxdb';
 import memory from 'pouchdb-adapter-memory';
 import http from 'pouchdb-adapter-http';
 import uuid from 'uuid/v4';
+import { wait } from 'promist';
 import { spawn } from 'child_process';
 import registerUtils from '../../src';
 
@@ -50,9 +51,7 @@ function server() {
     : 'pouchdb-server';
   const port = String(Math.floor(Math.random() * (5995 - 5005 + 1) + 5005));
   const run = async () => {
-    if (!waitFirstRun) {
-      waitFirstRun = new Promise((resolve) => setTimeout(resolve, 10000));
-    }
+    if (!waitFirstRun) waitFirstRun = wait(10000);
     await waitFirstRun;
     return spawn(cmd, ['-p', port, '-m']);
   };

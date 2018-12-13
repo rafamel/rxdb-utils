@@ -1,4 +1,5 @@
 import setup, { teardown, model } from './utils/db';
+import { wait } from 'promist';
 
 test(`throws when there is no schema or no schema.properties`, async () => {
   expect.assertions(2);
@@ -47,7 +48,7 @@ test(`timestamps on creation are correct`, async () => {
   expect.assertions(4);
 
   const beforeDate = new Date();
-  await new Promise((resolve) => setTimeout(resolve, 100));
+  await wait(100);
 
   const db = await setup();
   await db.collection({
@@ -57,7 +58,7 @@ test(`timestamps on creation are correct`, async () => {
   await db.collections.items.insert({});
   const item = await db.collections.items.findOne().exec();
 
-  await new Promise((resolve) => setTimeout(resolve, 100));
+  await wait(100);
   const afterDate = new Date();
 
   expect(beforeDate < new Date(item.createdAt)).toBe(true);
@@ -71,7 +72,7 @@ test(`timestamps on update are correct`, async () => {
   expect.assertions(4);
 
   const beforeDate = new Date();
-  await new Promise((resolve) => setTimeout(resolve, 100));
+  await wait(100);
 
   const db = await setup();
   await db.collection({
@@ -81,13 +82,13 @@ test(`timestamps on update are correct`, async () => {
   await db.collections.items.insert({});
   const item = await db.collections.items.findOne().exec();
 
-  await new Promise((resolve) => setTimeout(resolve, 100));
+  await wait(100);
   const middleDate = new Date();
-  await new Promise((resolve) => setTimeout(resolve, 100));
+  await wait(100);
 
   await item.update({ $set: { name: 'myName' } });
 
-  await new Promise((resolve) => setTimeout(resolve, 100));
+  await wait(100);
   const afterDate = new Date();
 
   expect(beforeDate < new Date(item.createdAt)).toBe(true);

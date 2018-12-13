@@ -1,5 +1,5 @@
 import setup, { teardown, model } from './utils/db';
-import asyncUtil from 'async-test-util';
+import { wait, waitUntil } from 'promist';
 import * as Rx from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import {
@@ -11,12 +11,7 @@ import {
 jest.setTimeout(25000);
 
 const subsTimeout = () => {
-  return new Promise((resolve) =>
-    setTimeout(
-      resolve,
-      CHECK_KEEP_OPEN_TIMEOUT + CLOSE_SUBSCRIPTION_TIMEOUT + 250
-    )
-  );
+  return wait(CHECK_KEEP_OPEN_TIMEOUT + CLOSE_SUBSCRIPTION_TIMEOUT + 250);
 };
 
 describe(`RxDocument.view`, () => {
@@ -62,7 +57,7 @@ describe(`RxDocument.view`, () => {
 
     let ans;
     const s = item.element.$.subscribe((x) => (ans = x));
-    await asyncUtil.waitUntil(() => ans);
+    await waitUntil(() => ans);
     s.unsubscribe();
 
     expect(ans).toBe(res);
@@ -172,9 +167,7 @@ describe(`RxQuery.ensure$()`, () => {
       options: {
         views: {
           get element() {
-            return Rx.from(
-              new Promise((resolve) => setTimeout(resolve, 1000))
-            ).pipe(map(() => res));
+            return Rx.from(wait(1000)).pipe(map(() => res));
           }
         }
       }
@@ -243,19 +236,13 @@ describe(`RxQuery.ensure$()`, () => {
       options: {
         views: {
           get element() {
-            return Rx.from(
-              new Promise((resolve) => setTimeout(resolve, 1000))
-            ).pipe(map(() => 'a'));
+            return Rx.from(wait(1000)).pipe(map(() => 'a'));
           },
           get element2() {
-            return Rx.from(
-              new Promise((resolve) => setTimeout(resolve, 2000))
-            ).pipe(map(() => 'b'));
+            return Rx.from(wait(2000)).pipe(map(() => 'b'));
           },
           get element3() {
-            return Rx.from(
-              new Promise((resolve) => setTimeout(resolve, 3000))
-            ).pipe(map(() => 'c'));
+            return Rx.from(wait(3000)).pipe(map(() => 'c'));
           }
         }
       }
@@ -300,9 +287,7 @@ describe(`RxQuery.ensure$()`, () => {
       options: {
         views: {
           get element() {
-            return Rx.from(
-              new Promise((resolve) => setTimeout(resolve, 2000))
-            ).pipe(map(() => res));
+            return Rx.from(wait(2000)).pipe(map(() => res));
           }
         }
       }
@@ -315,7 +300,7 @@ describe(`RxQuery.ensure$()`, () => {
       .findOne()
       .ensure$('element')
       .subscribe(() => !end1 && (end1 = Date.now()));
-    await asyncUtil.waitUntil(() => end1);
+    await waitUntil(() => end1);
 
     expect(end1 - init1).toBeGreaterThanOrEqual(2000);
     expect(end1 - init1).toBeLessThan(3000);
@@ -327,7 +312,7 @@ describe(`RxQuery.ensure$()`, () => {
       .findOne()
       .ensure$('element')
       .subscribe(() => !end2 && (end2 = Date.now()));
-    await asyncUtil.waitUntil(() => end2);
+    await waitUntil(() => end2);
 
     expect(end2 - init2).toBeLessThan(2000);
 
@@ -407,7 +392,7 @@ describe(`RxQuery.ensure$()`, () => {
     const s1 = e.subscribe(() => {});
     const s2 = e.subscribe(() => {});
 
-    await asyncUtil.waitUntil(() => item.element.ensured === true);
+    await waitUntil(() => item.element.ensured === true);
     expect(item.element.ensured).toBe(true);
 
     await subsTimeout();
@@ -453,7 +438,7 @@ describe(`RxQuery.ensure$()`, () => {
       .ensure$('element')
       .subscribe(() => {});
 
-    await asyncUtil.waitUntil(() => item.element.ensured === true);
+    await waitUntil(() => item.element.ensured === true);
     expect(item.element.ensured).toBe(true);
     expect(item.element2.ensured).toBe(true);
 
@@ -489,7 +474,7 @@ describe(`RxQuery.ensure$()`, () => {
     const e = collection.findOne().ensure$('element');
     const s1 = e.subscribe(() => {});
 
-    await asyncUtil.waitUntil(() => item.element.ensured === true);
+    await waitUntil(() => item.element.ensured === true);
     s1.unsubscribe();
     await subsTimeout();
 
@@ -527,18 +512,16 @@ describe(`RxQuery.ensure$()`, () => {
       .ensure$('element')
       .subscribe(() => {});
 
-    await asyncUtil.waitUntil(() => item1.element.ensured === true);
+    await waitUntil(() => item1.element.ensured === true);
     expect(item1.element.ensured).toBe(true);
 
     await item1.update({ $set: { name: 'changed' } });
     const item2 = await collection.insert({ name: 'first' });
 
-    await asyncUtil.waitUntil(() => item2.element.ensured === true);
+    await waitUntil(() => item2.element.ensured === true);
     expect(item2.element.ensured).toBe(true);
 
-    await new Promise((resolve) =>
-      setTimeout(resolve, ENSURE_CLEANUP_TIMEOUT + 250)
-    );
+    await wait(ENSURE_CLEANUP_TIMEOUT + 250);
 
     expect(item1.element.ensured).toBe(false);
     expect(item2.element.ensured).toBe(true);
