@@ -14,7 +14,6 @@
     "realtime"
   ],
   "scripts": {
-    "precommit": "cross-env MSG=\"Committing in:\" nps validate",
     "prepublishOnly": "exit 1",
     "start": "npm run watch",
     "build": "nps build",
@@ -24,12 +23,19 @@
     "lint": "nps lint",
     "lint:test": "nps lint.test",
     "lint:md": "nps lint.md",
+    "lint:scripts": "nps lint.scripts",
+    "lint:typings": "nps lint.typings",
     "test": "nps test",
     "test:watch": "nps test.watch",
     "validate": "nps validate",
     "update": "nps update",
-    "clean": "nps clean"
+    "clean": "nps clean",
+    "docs": "nps docs",
+    "nps": "nps",
+    "jake": "jake"
   },
+  "main": "src/index.js",
+  "types": "./typings/index.d.ts",
   "license": "MIT",
   "homepage": "https://github.com/rafamel/rxdb-utils",
   "repository": {
@@ -40,43 +46,51 @@
     "url": "https://github.com/rafamel/rxdb-utils/issues"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.5",
-    "async-test-util": "^1.6.1",
-    "babel-cli": "^6.26.0",
-    "babel-eslint": "^9.0.0",
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/plugin-proposal-class-properties": "^7.0.0",
+    "@babel/plugin-proposal-decorators": "^7.0.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/register": "^7.0.0",
+    "@types/jest": "^23.3.9",
+    "async-test-util": "^1.6.3",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-eslint": "^10.0.1",
+    "babel-jest": "^23.4.2",
     "babel-plugin-module-resolver": "^3.1.1",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-plugin-transform-decorators-legacy": "^1.3.5",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "concurrently": "^4.0.1",
     "coveralls": "^3.0.2",
     "cross-env": "^5.2.0",
-    "eslint": "^5.7.0",
-    "eslint-config-prettier": "^3.1.0",
+    "eslint": "^5.9.0",
+    "eslint-config-prettier": "^3.3.0",
     "eslint-config-standard": "^12.0.0",
-    "eslint-import-resolver-babel-module": "^4.0.0",
-    "eslint-plugin-babel": "^5.2.1",
+    "eslint-import-resolver-babel-module": "^5.0.0-beta.1",
+    "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-jest": "^21.24.2",
-    "eslint-plugin-node": "^7.0.1",
-    "eslint-plugin-prettier": "^2.7.0",
+    "eslint-plugin-jest": "^22.0.0",
+    "eslint-plugin-node": "^8.0.0",
+    "eslint-plugin-prettier": "^3.0.0",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
-    "eslint-restricted-globals": "^0.1.1",
-    "husky": "^0.14.3",
+    "eslint-restricted-globals": "^0.2.0",
+    "husky": "^1.2.0",
+    "jake": "^8.0.19",
     "jest-cli": "^23.6.0",
     "markdownlint-cli": "^0.13.0",
     "nps": "^5.9.3",
-    "npx": "^10.2.0",
-    "onchange": "^4.1.0",
+    "onchange": "^5.2.0",
     "pouchdb-adapter-http": "^7.0.0",
-    "pouchdb-adapter-memory": "7.0.0",
+    "pouchdb-adapter-memory": "^7.0.0",
     "pouchdb-server": "^4.1.0",
-    "prettier": "^1.14.3",
-    "rxdb": "^8.0.3",
+    "prettier": "^1.15.2",
+    "rxdb": "^8.0.4",
     "rxjs": "^6.3.3",
     "shx": "^0.3.2",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.17.0",
+    "typedoc": "^0.13.0",
+    "typedoc-plugin-external-module-name": "^1.1.3",
+    "typescript": "^3.2.1",
     "uuid": "^3.3.2"
   },
   "peerDependencies": {
@@ -87,7 +101,7 @@
     "lodash.flattendeep": "^4.4.0",
     "lodash.merge": "^4.6.1",
     "loglevel": "^1.6.1",
-    "object-hash": "^1.3.0"
+    "object-hash": "^1.3.1"
   },
   "jest": {
     "testEnvironment": "node",
@@ -98,5 +112,10 @@
     "modulePathIgnorePatterns": [
       "<rootDir>/build"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "cross-env MSG=\"Committing in:\" nps validate"
+    }
   }
 }

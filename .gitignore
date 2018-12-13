@@ -1,5 +1,6 @@
 # Project Specific #
 ####################
+/docs
 log.txt
 config.json
 

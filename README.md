@@ -79,7 +79,7 @@ loglevel(loglevels.WARN);
 
 ## Plugins
 
-## models
+### models
 
 Will allow you to batch create collections on a database from an array of models.
 
