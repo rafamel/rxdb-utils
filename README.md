@@ -6,7 +6,7 @@
 [![Dependencies](https://david-dm.org/rafamel/rxdb-utils/status.svg)](https://david-dm.org/rafamel/rxdb-utils)
 [![Vulnerabilities](https://snyk.io/test/npm/rxdb-utils/badge.svg)](https://snyk.io/test/npm/rxdb-utils)
 [![Issues](https://img.shields.io/github/issues/rafamel/rxdb-utils.svg)](https://github.com/rafamel/rxdb-utils/issues)
-[![License](https://img.shields.io/github/license/rafamel/rxdb-utils.svg)](https://github.com/rafamel/rxdb-utils/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/rafamel/rxdb-utils.svg)](https://github.com/rafamel/rxdb-utils/blob/master/LICENSE) [![Greenkeeper badge](https://badges.greenkeeper.io/rafamel/rxdb-utils.svg)](https://greenkeeper.io/)
 
 <!-- markdownlint-disable MD036 -->
 **RxDB's missing pieces**
