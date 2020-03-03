@@ -1,3 +1,16 @@
+const options = (src) => {
+  const { timestamps } = Object.assign({}, src.database.options, src.options);
+  if (!timestamps) return false;
+  let fields = {
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+  if (timestamps !== true) {
+    fields = Object.assign(fields, timestamps);
+  }
+  return fields;
+};
+
 export default {
   rxdb: true,
   prototypes: {
@@ -5,22 +18,22 @@ export default {
       const prevCollection = proto.collection;
       Object.assign(proto, {
         async collection(model, ...other) {
-          const timestamps = model && model.options && model.options.timestamps;
-
           const collection = await prevCollection.call(this, model, other);
-          if (!timestamps) return collection;
+
+          const fields = options(collection);
+          if (!fields) return collection;
 
           // Register hooks
           collection.preInsert((data) => {
             const now = new Date().toISOString();
-            if (!data.createdAt) data.createdAt = now;
-            if (!data.updatedAt) data.updatedAt = now;
+            if (!data[fields.createdAt]) data[fields.createdAt] = now;
+            if (!data[fields.updatedAt]) data[fields.updatedAt] = now;
 
             return data;
           });
 
           collection.preSave((data, doc) => {
-            data.updatedAt = new Date().toISOString();
+            data[fields.updatedAt] = new Date().toISOString();
             return data;
           });
 
@@ -38,22 +51,26 @@ export default {
         );
       }
 
-      const timestamps = model && model.options && model.options.timestamps;
-      if (!timestamps) return model;
+      const fields = options(model);
+      if (!fields) return model;
 
       // Set schema
-      model.schema.properties.createdAt = model.schema.properties.createdAt || {
-        format: 'date-time',
-        type: 'string'
-      };
-      model.schema.properties.updatedAt = model.schema.properties.updatedAt || {
-        format: 'date-time',
-        type: 'string'
-      };
+      if (!model.schema.properties[fields.createdAt]) {
+        model.schema.properties[fields.createdAt] = {
+          format: 'date-time',
+          type: 'string'
+        };
+      }
+      if (!model.schema.properties[fields.updatedAt]) {
+        model.schema.properties[fields.updatedAt] = {
+          format: 'date-time',
+          type: 'string'
+        };
+      }
 
       model.schema.required = (model.schema.required || []).concat([
-        'createdAt',
-        'updatedAt'
+        fields.createdAt,
+        fields.updatedAt
       ]);
 
       return model;

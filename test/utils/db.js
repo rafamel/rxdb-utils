@@ -12,12 +12,13 @@ registerUtils(RxDB);
 
 const nameGen = () => 'a' + uuid().replace(/[^a-zA-Z0-9]/g, '');
 
-function setup() {
+function setup(options) {
   return RxDB.create({
     name: nameGen(),
     adapter: 'memory',
     multiInstance: false,
-    ignoreDuplicate: true
+    ignoreDuplicate: true,
+    options: options
   });
 }
 
