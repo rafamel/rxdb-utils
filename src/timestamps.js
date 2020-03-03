@@ -58,7 +58,8 @@ export default {
       if (!model.schema.properties[fields.createdAt]) {
         model.schema.properties[fields.createdAt] = {
           format: 'date-time',
-          type: 'string'
+          type: 'string',
+          final: true
         };
       }
       if (!model.schema.properties[fields.updatedAt]) {
