@@ -1,0 +1,94 @@
+{
+  "name": "rxdb-mobx",
+  "version": "0.0.1",
+  "author": "Rafa Mel",
+  "description": "Mobx and React integration for RxDB",
+  "keywords": [
+    "rxdb",
+    "mobx",
+    "pouchdb",
+    "couchdb",
+    "offline",
+    "realtime"
+  ],
+  "main": "./lib/index.js",
+  "scripts": {
+    "precommit": "cross-env MSG=\"Committing in:\" nps validate",
+    "prepublishOnly": "nps build",
+    "start": "npm run watch",
+    "build": "nps build",
+    "watch": "nps watch",
+    "fix": "nps fix",
+    "lint": "nps lint",
+    "lint:test": "nps lint.test",
+    "lint:md": "nps lint.md",
+    "test": "nps test",
+    "test:watch": "nps test.watch",
+    "validate": "nps validate",
+    "update": "nps update",
+    "clean": "nps clean"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/rafamel/rxdb-mobx",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rafamel/rxdb-mobx"
+  },
+  "bugs": {
+    "url": "https://github.com/rafamel/rxdb-mobx/issues"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.3.1",
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.2.6",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-decorators-legacy": "^1.3.5",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "concurrently": "^3.6.1",
+    "coveralls": "^3.0.2",
+    "cross-env": "^5.2.0",
+    "eslint": "^5.4.0",
+    "eslint-config-prettier": "^3.0.1",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-babel": "^5.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jest": "^21.21.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-prettier": "^2.6.2",
+    "eslint-plugin-promise": "^4.0.0",
+    "eslint-plugin-react": "^7.11.1",
+    "eslint-plugin-react-app": "^3.0.0",
+    "eslint-plugin-standard": "^3.1.0",
+    "eslint-restricted-globals": "^0.1.1",
+    "husky": "^0.14.3",
+    "jest-cli": "^23.5.0",
+    "markdownlint-cli": "^0.13.0",
+    "mobx": "^5.0.3",
+    "mobx-react": "^5.2.5",
+    "nps": "^5.9.3",
+    "npx": "^10.2.0",
+    "onchange": "^4.1.0",
+    "pouchdb-adapter-memory": "^7.0.0",
+    "prettier": "^1.14.2",
+    "react": "^16.4.2",
+    "rxdb": "^8.0.0-beta.8",
+    "rxjs": "^6.2.2",
+    "shx": "^0.3.2"
+  },
+  "peerDependencies": {
+    "mobx": "^5.0.3",
+    "rxdb": "7.7.1",
+    "mobx-react": "^5.2.5",
+    "react": "^16.4.0"
+  },
+  "dependencies": {
+    "mobx-utils": "^5.0.1"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverage": true
+  }
+}
