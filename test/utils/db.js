@@ -1,7 +1,8 @@
 import * as RxDB from 'rxdb';
 import memory from 'pouchdb-adapter-memory';
 import http from 'pouchdb-adapter-http';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
+import { wait } from 'promist';
 import { spawn } from 'child_process';
 import registerUtils from '../../src';
 
@@ -11,12 +12,13 @@ registerUtils(RxDB);
 
 const nameGen = () => 'a' + uuid().replace(/[^a-zA-Z0-9]/g, '');
 
-function setup() {
+function setup(options) {
   return RxDB.create({
     name: nameGen(),
     adapter: 'memory',
     multiInstance: false,
-    ignoreDuplicate: true
+    ignoreDuplicate: true,
+    options: options
   });
 }
 
@@ -50,9 +52,7 @@ function server() {
     : 'pouchdb-server';
   const port = String(Math.floor(Math.random() * (5995 - 5005 + 1) + 5005));
   const run = async () => {
-    if (!waitFirstRun) {
-      waitFirstRun = new Promise((resolve) => setTimeout(resolve, 10000));
-    }
+    if (!waitFirstRun) waitFirstRun = wait(10000);
     await waitFirstRun;
     return spawn(cmd, ['-p', port, '-m']);
   };

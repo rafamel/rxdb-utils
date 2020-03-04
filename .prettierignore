@@ -1,5 +1,6 @@
-lib
+pkg
 build
+lib
 dist
 out
 .vscode

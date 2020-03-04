@@ -7,11 +7,7 @@ export default {
       const prevRemove = proto.remove;
       Object.assign(proto, {
         async remove(...args) {
-          try {
-            return await prevRemove.apply(this, args);
-          } catch (e) {
-            throw e;
-          }
+          return await prevRemove.apply(this, args);
         }
       });
     }

@@ -5,7 +5,7 @@ import {
 } from './constants';
 
 export default function createSubject(observable, opts = {}) {
-  let options = {
+  const options = {
     keepOpenCheck: () => false,
     onInit: () => {},
     onTeardown: () => {}

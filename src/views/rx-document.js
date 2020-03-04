@@ -1,4 +1,4 @@
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { take, tap } from 'rxjs/operators';
 import createSubject from './create-subject';
 import { OBSERVABLES_SYMBOL, ENSURE_SYMBOL } from './constants';
@@ -44,10 +44,10 @@ export default function RxDocument(proto, viewsArr) {
 function createView(getObs) {
   const obj = {};
 
-  let ensuredIds = {};
-  let ensured = false;
-  let observable;
   let value;
+  let observable;
+  let ensured = false;
+  const ensuredIds = {};
   Object.defineProperties(obj, {
     [ENSURE_SYMBOL]: {
       value: function ensure() {

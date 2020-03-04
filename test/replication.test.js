@@ -1,6 +1,6 @@
 import setup, { pouchSetup, server, teardown, model } from './utils/db';
 import { PouchDB } from 'rxdb';
-import asyncUtil from 'async-test-util';
+import { until } from 'promist';
 
 jest.setTimeout(20000);
 
@@ -67,7 +67,45 @@ describe(`- Basic setup`, () => {
     expect(item.rx_model).toBe('items');
     await teardown(db);
   });
+  test(`throws when a property is has the same name as the custom field`, async () => {
+    expect.assertions(1);
 
+    const db = await setup({ replication: { field: 'custom' } });
+    const data = model('items');
+    data.schema.properties.custom = {
+      type: 'string',
+      enum: ['items'],
+      default: 'some'
+    };
+
+    await expect(db.collection(data)).rejects.toThrowError();
+    await teardown(db);
+  });
+  test(`doesn't throw when a property has the same name and definition as the custom field`, async () => {
+    expect.assertions(1);
+
+    const db = await setup({ replication: { field: 'custom' } });
+    const data = model('items');
+    data.schema.properties.custom = {
+      type: 'string',
+      enum: ['items'],
+      default: 'items'
+    };
+
+    await expect(db.collection(data)).resolves.toBeTruthy();
+    await teardown(db);
+  });
+  test(`adds custom field`, async () => {
+    expect.assertions(1);
+
+    const db = await setup({ replication: { field: 'custom' } });
+    await db.collection(model('items'));
+    await db.collections.items.insert({});
+    const item = await db.collections.items.findOne().exec();
+
+    expect(item.custom).toBe('items');
+    await teardown(db);
+  });
   test(`db.replicate() exists`, async () => {
     expect.assertions(1);
 
@@ -106,7 +144,7 @@ describe(`- Basic setup`, () => {
 });
 
 describe(`- Sync`, () => {
-  test(`Sync works`, async () => {
+  test(`Sync works with rx_model default`, async () => {
     expect.assertions(3);
 
     const db = await setup();
@@ -118,7 +156,7 @@ describe(`- Sync`, () => {
 
     await db.collections.items.insert({ name: 'some' });
     const item = await db.collections.items.findOne().exec();
-    await asyncUtil.waitUntil(() => dbPouch.get(item._id).catch(() => false));
+    await until(() => dbPouch.get(item._id).catch(() => false));
 
     expect(db.replications.length).toBe(1);
     expect(replication.replicationStates.length).toBe(1);
@@ -126,7 +164,7 @@ describe(`- Sync`, () => {
 
     await teardown(replication, dbPouch, db);
   });
-  test(`Sync w/ keyCompression works`, async () => {
+  test(`Sync w/ keyCompression works with rx_model default`, async () => {
     expect.assertions(3);
 
     const db = await setup();
@@ -141,7 +179,50 @@ describe(`- Sync`, () => {
 
     await db.collections.items.insert({ name: 'some' });
     const item = await db.collections.items.findOne().exec();
-    await asyncUtil.waitUntil(() => dbPouch.get(item._id).catch(() => false));
+    await until(() => dbPouch.get(item._id).catch(() => false));
+
+    expect(db.replications.length).toBe(1);
+    expect(replication.replicationStates.length).toBe(1);
+    await expect(dbPouch.get(item._id)).resolves.toHaveProperty('name', 'some');
+
+    await teardown(replication, dbPouch, db);
+  });
+  test(`Sync works with custom field`, async () => {
+    expect.assertions(3);
+
+    const db = await setup({ replication: { field: 'custom' } });
+    await db.collection(model('items'));
+
+    const dbPouch = pouchSetup();
+    const replication = db.replicate(dbPouch);
+    await replication.connect();
+
+    await db.collections.items.insert({ name: 'some' });
+    const item = await db.collections.items.findOne().exec();
+    await until(() => dbPouch.get(item._id).catch(() => false));
+
+    expect(db.replications.length).toBe(1);
+    expect(replication.replicationStates.length).toBe(1);
+    await expect(dbPouch.get(item._id)).resolves.toHaveProperty('name', 'some');
+
+    await teardown(replication, dbPouch, db);
+  });
+  test(`Sync w/ keyCompression works with custom field`, async () => {
+    expect.assertions(3);
+
+    const db = await setup({ replication: { field: 'custom' } });
+    await db.collection({
+      ...model('items'),
+      keyCompression: true
+    });
+
+    const dbPouch = pouchSetup();
+    const replication = db.replicate(dbPouch);
+    await replication.connect();
+
+    await db.collections.items.insert({ name: 'some' });
+    const item = await db.collections.items.findOne().exec();
+    await until(() => dbPouch.get(item._id).catch(() => false));
 
     expect(db.replications.length).toBe(1);
     expect(replication.replicationStates.length).toBe(1);
@@ -165,8 +246,8 @@ describe(`- Sync`, () => {
     await db.collections.items.insert({ name: 'some' });
     const item = await db.collections.items.findOne().exec();
 
-    await asyncUtil.waitUntil(() => dbPouch1.get(item._id).catch(() => false));
-    await asyncUtil.waitUntil(() => dbPouch2.get(item._id).catch(() => false));
+    await until(() => dbPouch1.get(item._id).catch(() => false));
+    await until(() => dbPouch2.get(item._id).catch(() => false));
 
     expect(db.replications.length).toBe(2);
     await expect(dbPouch1.get(item._id)).resolves.toHaveProperty(
@@ -193,7 +274,7 @@ describe(`- Sync`, () => {
 
     await db.collections.items.insert({ name: 'some' });
     const item = await db.collections.items.findOne().exec();
-    await asyncUtil.waitUntil(() => dbPouch.get(item._id).catch(() => false));
+    await until(() => dbPouch.get(item._id).catch(() => false));
 
     expect(replication.replicationStates.length).toBe(2);
     await expect(dbPouch.get(item._id)).resolves.toHaveProperty('name', 'some');
@@ -221,7 +302,7 @@ describe(`- Sync`, () => {
     await db.collections.items.insert({ name: 'some' });
     const item = await db.collections.items.findOne().exec();
     const element = await db.collections.elements.findOne().exec();
-    await asyncUtil.waitUntil(() => dbPouch.get(item._id).catch(() => false));
+    await until(() => dbPouch.get(item._id).catch(() => false));
 
     await expect(dbPouch.get(item._id)).resolves.toHaveProperty('name', 'some');
     await expect(dbPouch.get(element._id)).rejects.toThrowError();
@@ -244,7 +325,7 @@ describe(`- Functionality`, () => {
 
     await db.collections.items.insert({ name: 'some' });
     const item = await db.collections.items.findOne().exec();
-    await asyncUtil.waitUntil(() =>
+    await until(() =>
       dbPouch
         .get(item._id)
         .then(() => false)
@@ -269,7 +350,7 @@ describe(`- Functionality`, () => {
 
     await db.collections.items.insert({ name: 'some' });
     const item = await db.collections.items.findOne().exec();
-    await asyncUtil.waitUntil(() =>
+    await until(() =>
       dbPouch
         .get(item._id)
         .then(() => false)
@@ -300,7 +381,7 @@ describe(`- Remote sync`, () => {
     await db.collections.items.insert({ name: 'some' });
     const item = await db.collections.items.findOne().exec();
 
-    await asyncUtil.waitUntil(() => dbPouch.get(item._id).catch(() => false));
+    await until(() => dbPouch.get(item._id).catch(() => false));
     expect(db.replications.length).toBe(1);
     expect(replication.replicationStates.length).toBe(1);
     await expect(dbPouch.get(item._id)).resolves.toHaveProperty('name', 'some');
@@ -325,7 +406,7 @@ describe(`- Remote sync`, () => {
 
     const proc = await run();
     // Connection recovery interval is 5s
-    await asyncUtil.waitUntil(() => dbPouch.get(item._id).catch(() => false));
+    await until(() => dbPouch.get(item._id).catch(() => false));
 
     expect(db.replications.length).toBe(1);
     expect(replication.replicationStates.length).toBe(1);
@@ -349,7 +430,7 @@ describe(`- Remote sync`, () => {
     const subscription = replication.alive$.subscribe(
       (state) => (aliveS = state)
     );
-    await asyncUtil.waitUntil(() => !aliveS);
+    await until(() => !aliveS);
 
     expect(subscription).toHaveProperty('unsubscribe');
     expect(typeof subscription.unsubscribe).toBe('function');
@@ -357,7 +438,7 @@ describe(`- Remote sync`, () => {
 
     const proc = await run();
     // Connection recovery interval is 5s
-    await asyncUtil.waitUntil(() => aliveS);
+    await until(() => aliveS);
 
     expect(aliveS).toBe(true);
 

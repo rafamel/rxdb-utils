@@ -16,7 +16,7 @@ function parseObj(obj) {
 
 function parseString(str) {
   const all = str.split('.');
-  let obj = {};
+  const obj = {};
   let current = obj;
   all.forEach((key) => {
     if (!current[key]) current[key] = {};

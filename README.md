@@ -1,22 +1,18 @@
 # rxdb-utils
 
-[![Version](https://img.shields.io/github/package-json/v/rafamel/rxdb-utils.svg)](https://github.com/rafamel/rxdb-utils)
-[![Build Status](https://travis-ci.org/rafamel/rxdb-utils.svg)](https://travis-ci.org/rafamel/rxdb-utils)
-[![Coverage](https://img.shields.io/coveralls/rafamel/rxdb-utils.svg)](https://coveralls.io/github/rafamel/rxdb-utils)
-[![Dependencies](https://david-dm.org/rafamel/rxdb-utils/status.svg)](https://david-dm.org/rafamel/rxdb-utils)
-[![Vulnerabilities](https://snyk.io/test/npm/rxdb-utils/badge.svg)](https://snyk.io/test/npm/rxdb-utils)
-[![Issues](https://img.shields.io/github/issues/rafamel/rxdb-utils.svg)](https://github.com/rafamel/rxdb-utils/issues)
+[![Version](https://img.shields.io/npm/v/rxdb-utils.svg)](https://www.npmjs.com/package/rxdb-utils)
+[![Build Status](https://img.shields.io/travis/rafamel/rxdb-utils/master.svg)](https://travis-ci.org/rafamel/rxdb-utils)
+[![Coverage](https://img.shields.io/coveralls/rafamel/rxdb-utils/master.svg)](https://coveralls.io/github/rafamel/rxdb-utils)
+[![Dependencies](https://img.shields.io/david/rafamel/rxdb-utils.svg)](https://david-dm.org/rafamel/rxdb-utils)
+[![Vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/rxdb-utils.svg)](https://snyk.io/test/npm/rxdb-utils)
 [![License](https://img.shields.io/github/license/rafamel/rxdb-utils.svg)](https://github.com/rafamel/rxdb-utils/blob/master/LICENSE)
+[![Types](https://img.shields.io/npm/types/rxdb-utils.svg)](https://www.npmjs.com/package/rxdb-utils)
 
-<!-- markdownlint-disable MD036 -->
-**RxDB's missing pieces**
-<!-- markdownlint-enable MD036 -->
+> RxDB's missing pieces.
 
 ## Install
 
 [`npm install rxdb-utils`](https://www.npmjs.com/package/rxdb-utils)
-
-It's required to have `rxdb@^8.0.0` and `rxjs@^6.0.0` installed in order to use `rxdb-utils`: `npm install rxdb rxjs`.
 
 ## Setup
 
@@ -66,9 +62,20 @@ RxDB.plugin(hooks);
 RxDB.plugin(replication);
 ```
 
+### Logging
+
+You can set up the logging level on the console for plugins by doing (default is `WARN` on development and `ERROR` on production):
+
+```javascript
+import { loglevel, loglevels } from 'rxdb-utils/logger';
+
+// Or any other from { SILENT, TRACE, DEBUG, INFO, WARN, ERROR }
+loglevel(loglevels.WARN);
+```
+
 ## Plugins
 
-## models
+### models
 
 Will allow you to batch create collections on a database from an array of models.
 
@@ -277,10 +284,10 @@ db.collection({
 });
 ```
 
-Additionally, when building complex applications, it could be that several observable returning methods you define use other observable returning methods, meaning, they might be interdependent. Say you have `method1`, which depends on data provided by `method2` and `method3`, but `method2` does also depend on data provided by `method3`. To prevent `method3` from being called several times without maintaining a `Subject`, the `observable` plugin allows you to define an object containing the subscribable part of the function in key `$` as an observable returning function, mapping to a synchronous function in key `get` that should take in all data needed, and accessible via `RxDocument.method.get()`. This way, subscribers will only be set for the method that is actually called, which will provide all data to inner methods.
+Additionally, when building complex applications, it could be that several observable returning methods you define use other observable returning methods, meaning, they might be interdependent. Say you have `method1`, which depends on data provided by `method2` and `method3`, but `method2` does also depend on data provided by `method3`. To prevent `method3` from being called several times without maintaining a `Subject`, the `observable` plugin allows you to define an object containing the subscribable part of the function in key `$` as an observable returning function, mapping to a function in key `get` that should take in all data needed, and accessible via `RxDocument.method.get()`. This way, subscribers will only be set for the method that is actually called, which will provide all data to inner methods. `get` can also be a promise-returning function.
 
 ```javascript
-import { combineLatest } from 'rxjs';
+import { combineLatest, from } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 db.collection({
@@ -292,14 +299,18 @@ db.collection({
     observables: {
       method1_userInfo(extraStr, hidden) {
         return combineLatest(this.name$, this.description$).pipe(
-          map(([name, description]) => {
-            const hide = this.method3_doHide.get({ name, hidden });
-            const nameExtra = this.method2_nameExtra
-              .get({ name, hidden, extraStr });
+          switchMap(([name, description]) => {
+            return from(
+              this.method2_nameExtra.get({ name, hidden, extraStr })
+            ).pipe(
+              map(nameExtra => {
+                const hide = this.method3_doHide.get({ name, hidden });
 
-            return `name: ${nameExtra}, description: ${
-              hide ? 'Who knows!?' : description
-            }`;
+                return `name: ${nameExtra}, description: ${
+                  hide ? 'Who knows!?' : description
+                }`;
+              })
+            );
           })
         );
       },
@@ -307,7 +318,7 @@ db.collection({
         $(extraStr = 'is great!', hidden) {
           return this.name$.pipe(map(name => ({ name, hidden, extraStr })));
         },
-        get({ name, hidden, extraStr }) {
+        async get({ name, hidden, extraStr }) {
           const hide = this.method3_doHide.get({ name, hidden });
           return hide ? 'No-one' : `${hName} ${extraStr}`;
         }
