@@ -44,10 +44,10 @@ export default function RxDocument(proto, viewsArr) {
 function createView(getObs) {
   const obj = {};
 
-  let ensuredIds = {};
-  let ensured = false;
-  let observable;
   let value;
+  let observable;
+  let ensured = false;
+  const ensuredIds = {};
   Object.defineProperties(obj, {
     [ENSURE_SYMBOL]: {
       value: function ensure() {

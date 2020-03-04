@@ -35,12 +35,7 @@ export default {
             return {
               $: get ? obs.pipe(piping) : obs,
               exec: () => {
-                return obs
-                  .pipe(
-                    take(1),
-                    get ? piping : (x) => x
-                  )
-                  .toPromise();
+                return obs.pipe(take(1), get ? piping : (x) => x).toPromise();
               }
             };
           }

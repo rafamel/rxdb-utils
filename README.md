@@ -1,22 +1,18 @@
 # rxdb-utils
 
-[![Version](https://img.shields.io/github/package-json/v/rafamel/rxdb-utils.svg)](https://github.com/rafamel/rxdb-utils)
-[![Build Status](https://travis-ci.org/rafamel/rxdb-utils.svg)](https://travis-ci.org/rafamel/rxdb-utils)
-[![Coverage](https://img.shields.io/coveralls/rafamel/rxdb-utils.svg)](https://coveralls.io/github/rafamel/rxdb-utils)
-[![Dependencies](https://david-dm.org/rafamel/rxdb-utils/status.svg)](https://david-dm.org/rafamel/rxdb-utils)
-[![Vulnerabilities](https://snyk.io/test/npm/rxdb-utils/badge.svg)](https://snyk.io/test/npm/rxdb-utils)
-[![Issues](https://img.shields.io/github/issues/rafamel/rxdb-utils.svg)](https://github.com/rafamel/rxdb-utils/issues)
+[![Version](https://img.shields.io/npm/v/rxdb-utils.svg)](https://www.npmjs.com/package/rxdb-utils)
+[![Build Status](https://img.shields.io/travis/rafamel/rxdb-utils/master.svg)](https://travis-ci.org/rafamel/rxdb-utils)
+[![Coverage](https://img.shields.io/coveralls/rafamel/rxdb-utils/master.svg)](https://coveralls.io/github/rafamel/rxdb-utils)
+[![Dependencies](https://img.shields.io/david/rafamel/rxdb-utils.svg)](https://david-dm.org/rafamel/rxdb-utils)
+[![Vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/rxdb-utils.svg)](https://snyk.io/test/npm/rxdb-utils)
 [![License](https://img.shields.io/github/license/rafamel/rxdb-utils.svg)](https://github.com/rafamel/rxdb-utils/blob/master/LICENSE)
+[![Types](https://img.shields.io/npm/types/rxdb-utils.svg)](https://www.npmjs.com/package/rxdb-utils)
 
-<!-- markdownlint-disable MD036 -->
-**RxDB's missing pieces**
-<!-- markdownlint-enable MD036 -->
+> RxDB's missing pieces.
 
 ## Install
 
 [`npm install rxdb-utils`](https://www.npmjs.com/package/rxdb-utils)
-
-It's required to have `rxdb@^8.0.0` and `rxjs@^6.0.0` installed in order to use `rxdb-utils`: `npm install rxdb rxjs`.
 
 ## Setup
 

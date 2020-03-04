@@ -13,29 +13,41 @@
     "offline",
     "realtime"
   ],
-  "scripts": {
-    "prepublishOnly": "exit 1",
-    "start": "npm run watch",
-    "build": "nps build",
-    "publish": "nps publish",
-    "watch": "nps watch",
-    "fix": "nps fix",
-    "lint": "nps lint",
-    "lint:test": "nps lint.test",
-    "lint:md": "nps lint.md",
-    "lint:scripts": "nps lint.scripts",
-    "lint:typings": "nps lint.typings",
-    "test": "nps test",
-    "test:watch": "nps test.watch",
-    "validate": "nps validate",
-    "update": "nps update",
-    "clean": "nps clean",
-    "docs": "nps docs",
-    "nps": "nps",
-    "jake": "jake"
+  "engines": {
+    "node": ">=12"
   },
-  "main": "src/index.js",
-  "types": "./typings/index.d.ts",
+  "main": "pkg/dist/index.js",
+  "types": "pkg/dist/index.d.ts",
+  "scripts": {
+    "commit": "kpo commit --",
+    "semantic": "kpo semantic --",
+    "fix": "kpo fix --",
+    "fix:scripts": "kpo fix:scripts --",
+    "lint": "kpo lint --",
+    "lint:md": "kpo lint:md --",
+    "lint:scripts": "kpo lint:scripts --",
+    "clean": "kpo clean --",
+    "clean:build": "kpo clean:build --",
+    "clean:modules": "kpo clean:modules --",
+    "prepublishOnly": "kpo prepublishOnly --",
+    "preversion": "kpo preversion --",
+    "version": "kpo version --",
+    "build": "kpo build --",
+    "build:transpile": "kpo build:transpile --",
+    "build:types": "kpo build:types --",
+    "fix:code": "kpo fix:code --",
+    "lint:code": "kpo lint:code --",
+    "lint:types": "kpo lint:types --",
+    "test": "kpo test --",
+    "verify": "kpo verify --",
+    "validate": "kpo validate --",
+    "docs": "kpo docs --",
+    "build:pack": "kpo build:pack --",
+    "build:static": "kpo build:static --",
+    "release": "kpo release --",
+    "watch": "kpo watch --",
+    "watch:test": "kpo watch:test --"
+  },
   "license": "MIT",
   "homepage": "https://github.com/rafamel/rxdb-utils",
   "repository": {
@@ -46,56 +58,25 @@
     "url": "https://github.com/rafamel/rxdb-utils/issues"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0",
-    "@babel/core": "^7.0.0",
-    "@babel/plugin-proposal-class-properties": "^7.0.0",
-    "@babel/plugin-proposal-decorators": "^7.0.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
-    "@babel/register": "^7.0.0",
-    "@types/jest": "^23.3.9",
-    "babel-core": "^7.0.0-bridge.0",
-    "babel-eslint": "^10.0.1",
-    "babel-jest": "^23.4.2",
-    "babel-plugin-module-resolver": "^3.1.1",
-    "coveralls": "^3.0.2",
-    "cross-env": "^5.2.0",
-    "eslint": "^5.9.0",
-    "eslint-config-prettier": "^3.3.0",
-    "eslint-config-standard": "^12.0.0",
-    "eslint-import-resolver-babel-module": "^5.0.0-beta.1",
-    "eslint-plugin-babel": "^5.3.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-jest": "^22.0.0",
-    "eslint-plugin-node": "^8.0.0",
-    "eslint-plugin-prettier": "^3.0.0",
-    "eslint-plugin-promise": "^4.0.1",
-    "eslint-plugin-standard": "^4.0.0",
-    "eslint-restricted-globals": "^0.2.0",
-    "husky": "^1.2.0",
-    "jake": "^8.0.19",
-    "jest-cli": "^23.6.0",
-    "markdownlint-cli": "^0.13.0",
-    "nps": "^5.9.3",
-    "onchange": "^5.2.0",
+    "@pika/pack": "^0.4.0",
+    "@pika/plugin-build-web": "^0.7.1",
+    "@pika/plugin-standard-pkg": "^0.7.1",
+    "@riseup/library": "^0.5.0",
+    "@riseup/tooling": "^0.5.0",
+    "@types/jest": "^24.0.21",
+    "@zerollup/ts-transform-paths": "^1.7.3",
+    "coveralls": "^3.0.7",
+    "husky": "^3.0.9",
+    "kpo": "^0.11.1",
+    "onchange": "^6.0.0",
     "pouchdb-adapter-http": "^7.0.0",
     "pouchdb-adapter-memory": "^7.0.0",
     "pouchdb-server": "^4.1.0",
-    "prettier": "^1.15.2",
     "promist": "^0.1.3",
     "rxdb": "^8.0.4",
     "rxjs": "^6.3.3",
-    "shx": "^0.3.2",
-    "tslint": "^5.11.0",
-    "tslint-config-prettier": "^1.17.0",
-    "typedoc": "^0.13.0",
-    "typedoc-plugin-external-module-name": "^1.1.3",
-    "typescript": "^3.2.1",
+    "typescript": "^3.6.4",
     "uuid": "^3.3.2"
-  },
-  "peerDependencies": {
-    "rxdb": "^8.0.0",
-    "rxjs": "^6.0.0"
   },
   "dependencies": {
     "lodash.flattendeep": "^4.4.0",
@@ -103,19 +84,29 @@
     "loglevel": "^1.6.1",
     "object-hash": "^1.3.1"
   },
-  "jest": {
-    "testEnvironment": "node",
-    "collectCoverage": true,
-    "collectCoverageFrom": [
-      "src/**/*.{js,ts,jsx}"
-    ],
-    "modulePathIgnorePatterns": [
-      "<rootDir>/build"
-    ]
+  "peerDependencies": {
+    "rxdb": "^8.0.0",
+    "rxjs": "^6.0.0"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "cross-env MSG=\"Committing in:\" nps validate"
+      "pre-commit": "kpo verify"
     }
+  },
+  "@pika/pack": {
+    "pipeline": [
+      [
+        "@pika/plugin-standard-pkg",
+        {
+          "exclude": [
+            "__mocks__/**/*",
+            "__tests__/**/*"
+          ]
+        }
+      ],
+      [
+        "@pika/plugin-build-web"
+      ]
+    ]
   }
 }
