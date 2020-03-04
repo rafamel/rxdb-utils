@@ -1,4 +1,4 @@
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { take, tap } from 'rxjs/operators';
 import createSubject from './create-subject';
 import { OBSERVABLES_SYMBOL, ENSURE_SYMBOL } from './constants';

@@ -1,5 +1,5 @@
 import setup, { teardown, model } from './utils/db';
-import { wait, waitUntil } from 'promist';
+import { wait, until } from 'promist';
 import * as Rx from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import {
@@ -57,7 +57,7 @@ describe(`RxDocument.view`, () => {
 
     let ans;
     const s = item.element.$.subscribe((x) => (ans = x));
-    await waitUntil(() => ans);
+    await until(() => ans);
     s.unsubscribe();
 
     expect(ans).toBe(res);
@@ -300,7 +300,7 @@ describe(`RxQuery.ensure$()`, () => {
       .findOne()
       .ensure$('element')
       .subscribe(() => !end1 && (end1 = Date.now()));
-    await waitUntil(() => end1);
+    await until(() => end1);
 
     expect(end1 - init1).toBeGreaterThanOrEqual(2000);
     expect(end1 - init1).toBeLessThan(3000);
@@ -312,7 +312,7 @@ describe(`RxQuery.ensure$()`, () => {
       .findOne()
       .ensure$('element')
       .subscribe(() => !end2 && (end2 = Date.now()));
-    await waitUntil(() => end2);
+    await until(() => end2);
 
     expect(end2 - init2).toBeLessThan(2000);
 
@@ -392,7 +392,7 @@ describe(`RxQuery.ensure$()`, () => {
     const s1 = e.subscribe(() => {});
     const s2 = e.subscribe(() => {});
 
-    await waitUntil(() => item.element.ensured === true);
+    await until(() => item.element.ensured === true);
     expect(item.element.ensured).toBe(true);
 
     await subsTimeout();
@@ -438,7 +438,7 @@ describe(`RxQuery.ensure$()`, () => {
       .ensure$('element')
       .subscribe(() => {});
 
-    await waitUntil(() => item.element.ensured === true);
+    await until(() => item.element.ensured === true);
     expect(item.element.ensured).toBe(true);
     expect(item.element2.ensured).toBe(true);
 
@@ -474,7 +474,7 @@ describe(`RxQuery.ensure$()`, () => {
     const e = collection.findOne().ensure$('element');
     const s1 = e.subscribe(() => {});
 
-    await waitUntil(() => item.element.ensured === true);
+    await until(() => item.element.ensured === true);
     s1.unsubscribe();
     await subsTimeout();
 
@@ -512,13 +512,13 @@ describe(`RxQuery.ensure$()`, () => {
       .ensure$('element')
       .subscribe(() => {});
 
-    await waitUntil(() => item1.element.ensured === true);
+    await until(() => item1.element.ensured === true);
     expect(item1.element.ensured).toBe(true);
 
     await item1.update({ $set: { name: 'changed' } });
     const item2 = await collection.insert({ name: 'first' });
 
-    await waitUntil(() => item2.element.ensured === true);
+    await until(() => item2.element.ensured === true);
     expect(item2.element.ensured).toBe(true);
 
     await wait(ENSURE_CLEANUP_TIMEOUT + 250);

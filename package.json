@@ -59,30 +59,30 @@
   },
   "devDependencies": {
     "@pika/pack": "^0.4.0",
-    "@pika/plugin-build-web": "^0.7.1",
-    "@pika/plugin-standard-pkg": "^0.7.1",
+    "@pika/plugin-build-web": "^0.8.3",
+    "@pika/plugin-standard-pkg": "^0.8.3",
     "@riseup/library": "^0.5.0",
     "@riseup/tooling": "^0.5.0",
-    "@types/jest": "^24.0.21",
+    "@types/jest": "^25.1.3",
     "@zerollup/ts-transform-paths": "^1.7.3",
     "coveralls": "^3.0.7",
-    "husky": "^3.0.9",
+    "husky": "^4.2.3",
     "kpo": "^0.11.1",
     "onchange": "^6.0.0",
-    "pouchdb-adapter-http": "^7.0.0",
-    "pouchdb-adapter-memory": "^7.0.0",
-    "pouchdb-server": "^4.1.0",
-    "promist": "^0.1.3",
+    "pouchdb-adapter-http": "^7.2.1",
+    "pouchdb-adapter-memory": "^7.2.1",
+    "pouchdb-server": "^4.2.0",
+    "promist": "^2.0.2",
     "rxdb": "^8.0.4",
     "rxjs": "^6.3.3",
     "typescript": "^3.6.4",
-    "uuid": "^3.3.2"
+    "uuid": "^7.0.2"
   },
   "dependencies": {
     "lodash.flattendeep": "^4.4.0",
     "lodash.merge": "^4.6.1",
     "loglevel": "^1.6.1",
-    "object-hash": "^1.3.1"
+    "object-hash": "^2.0.3"
   },
   "peerDependencies": {
     "rxdb": "^8.0.0",

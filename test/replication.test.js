@@ -1,6 +1,6 @@
 import setup, { pouchSetup, server, teardown, model } from './utils/db';
 import { PouchDB } from 'rxdb';
-import { waitUntil } from 'promist';
+import { until } from 'promist';
 
 jest.setTimeout(20000);
 
@@ -118,7 +118,7 @@ describe(`- Sync`, () => {
 
     await db.collections.items.insert({ name: 'some' });
     const item = await db.collections.items.findOne().exec();
-    await waitUntil(() => dbPouch.get(item._id).catch(() => false));
+    await until(() => dbPouch.get(item._id).catch(() => false));
 
     expect(db.replications.length).toBe(1);
     expect(replication.replicationStates.length).toBe(1);
@@ -141,7 +141,7 @@ describe(`- Sync`, () => {
 
     await db.collections.items.insert({ name: 'some' });
     const item = await db.collections.items.findOne().exec();
-    await waitUntil(() => dbPouch.get(item._id).catch(() => false));
+    await until(() => dbPouch.get(item._id).catch(() => false));
 
     expect(db.replications.length).toBe(1);
     expect(replication.replicationStates.length).toBe(1);
@@ -165,8 +165,8 @@ describe(`- Sync`, () => {
     await db.collections.items.insert({ name: 'some' });
     const item = await db.collections.items.findOne().exec();
 
-    await waitUntil(() => dbPouch1.get(item._id).catch(() => false));
-    await waitUntil(() => dbPouch2.get(item._id).catch(() => false));
+    await until(() => dbPouch1.get(item._id).catch(() => false));
+    await until(() => dbPouch2.get(item._id).catch(() => false));
 
     expect(db.replications.length).toBe(2);
     await expect(dbPouch1.get(item._id)).resolves.toHaveProperty(
@@ -193,7 +193,7 @@ describe(`- Sync`, () => {
 
     await db.collections.items.insert({ name: 'some' });
     const item = await db.collections.items.findOne().exec();
-    await waitUntil(() => dbPouch.get(item._id).catch(() => false));
+    await until(() => dbPouch.get(item._id).catch(() => false));
 
     expect(replication.replicationStates.length).toBe(2);
     await expect(dbPouch.get(item._id)).resolves.toHaveProperty('name', 'some');
@@ -221,7 +221,7 @@ describe(`- Sync`, () => {
     await db.collections.items.insert({ name: 'some' });
     const item = await db.collections.items.findOne().exec();
     const element = await db.collections.elements.findOne().exec();
-    await waitUntil(() => dbPouch.get(item._id).catch(() => false));
+    await until(() => dbPouch.get(item._id).catch(() => false));
 
     await expect(dbPouch.get(item._id)).resolves.toHaveProperty('name', 'some');
     await expect(dbPouch.get(element._id)).rejects.toThrowError();
@@ -244,7 +244,7 @@ describe(`- Functionality`, () => {
 
     await db.collections.items.insert({ name: 'some' });
     const item = await db.collections.items.findOne().exec();
-    await waitUntil(() =>
+    await until(() =>
       dbPouch
         .get(item._id)
         .then(() => false)
@@ -269,7 +269,7 @@ describe(`- Functionality`, () => {
 
     await db.collections.items.insert({ name: 'some' });
     const item = await db.collections.items.findOne().exec();
-    await waitUntil(() =>
+    await until(() =>
       dbPouch
         .get(item._id)
         .then(() => false)
@@ -300,7 +300,7 @@ describe(`- Remote sync`, () => {
     await db.collections.items.insert({ name: 'some' });
     const item = await db.collections.items.findOne().exec();
 
-    await waitUntil(() => dbPouch.get(item._id).catch(() => false));
+    await until(() => dbPouch.get(item._id).catch(() => false));
     expect(db.replications.length).toBe(1);
     expect(replication.replicationStates.length).toBe(1);
     await expect(dbPouch.get(item._id)).resolves.toHaveProperty('name', 'some');
@@ -325,7 +325,7 @@ describe(`- Remote sync`, () => {
 
     const proc = await run();
     // Connection recovery interval is 5s
-    await waitUntil(() => dbPouch.get(item._id).catch(() => false));
+    await until(() => dbPouch.get(item._id).catch(() => false));
 
     expect(db.replications.length).toBe(1);
     expect(replication.replicationStates.length).toBe(1);
@@ -349,7 +349,7 @@ describe(`- Remote sync`, () => {
     const subscription = replication.alive$.subscribe(
       (state) => (aliveS = state)
     );
-    await waitUntil(() => !aliveS);
+    await until(() => !aliveS);
 
     expect(subscription).toHaveProperty('unsubscribe');
     expect(typeof subscription.unsubscribe).toBe('function');
@@ -357,7 +357,7 @@ describe(`- Remote sync`, () => {
 
     const proc = await run();
     // Connection recovery interval is 5s
-    await waitUntil(() => aliveS);
+    await until(() => aliveS);
 
     expect(aliveS).toBe(true);
 

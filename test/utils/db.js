@@ -1,7 +1,7 @@
 import * as RxDB from 'rxdb';
 import memory from 'pouchdb-adapter-memory';
 import http from 'pouchdb-adapter-http';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { wait } from 'promist';
 import { spawn } from 'child_process';
 import registerUtils from '../../src';
