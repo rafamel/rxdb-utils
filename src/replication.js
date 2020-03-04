@@ -1,28 +1,34 @@
 import { PouchDB } from 'rxdb';
 import { BehaviorSubject } from 'rxjs';
-import keyCompression from 'rxdb/plugins/key-compression';
-import logger from '~/logger';
+import { overwritable } from 'rxdb/plugins/key-compression';
+import logger from './logger';
 
 export default {
   rxdb: true,
   prototypes: {},
   overwritable: {
-    createKeyCompressor(...args) {
-      const ans = keyCompression.overwritable.createKeyCompressor(...args);
-
-      ans._table = {
-        ...ans.table,
-        rx_model: 'rx_model'
-      };
-
+    createKeyCompressor(schema, ...args) {
+      const ans = overwritable.createKeyCompressor(schema, ...args);
+      for (const rxModel in schema.normalized.properties) {
+        if (schema.normalized.properties[rxModel].rx_model) {
+          ans._table = ans.table;
+          ans._table[rxModel] = rxModel;
+          break;
+        }
+      }
       return ans;
     }
   },
   hooks: {
     createRxDatabase(database) {
+      const options = database.options.replication;
+      database.options.replication = {
+        field: 'rx_model',
+        ...options
+      };
       database.replications = [];
       database.replicate = function replicate(...args) {
-        const replication = new Replication(database.collections, ...args);
+        const replication = new Replication(database, ...args);
 
         database.replications.push(replication);
         const index = database.replications.length - 1;
@@ -45,28 +51,32 @@ export default {
         );
       }
 
-      const rxModel = model.schema.properties.rx_model;
+      const field = model.database.options.replication.field;
+      const rxModel = model.schema.properties[field];
       if (rxModel && (rxModel.type !== 'string' || rxModel.default !== name)) {
-        throw Error('Schema properties cannot be called "rx_model"');
+        throw Error(`Schema property "${field}" is reserved by replication`);
       }
-      model.schema.properties.rx_model = {
+      model.schema.properties[field] = {
         type: 'string',
         enum: [name],
-        default: name
+        default: name,
+        final: true,
+        rx_model: true
       };
     }
   }
 };
 
 class Replication {
-  constructor(collections, remote, collectionNames, direction, options = {}) {
+  constructor(database, remote, collectionNames, direction, options = {}) {
+    this._field = database.options.replication.field;
     this.remote = remote;
     this.directon = direction;
     this.options = options;
     this.collections = !collectionNames
-      ? collections
+      ? database.collections
       : collectionNames.reduce((acc, key) => {
-          if (collections[key]) acc[key] = collections[key];
+          if (database.collections[key]) acc[key] = database.collections[key];
           return acc;
         }, {});
 
@@ -123,6 +133,9 @@ class Replication {
     const collections = this.collections;
     const collectionNames = Object.keys(collections);
     const promises = collectionNames.map((name) => {
+      // const query_params = {};
+      // query_params[this._field] = name;
+
       return collections[name].sync({
         remote: this.remote,
         direction: this.direction,
@@ -132,7 +145,7 @@ class Replication {
           retry: this.options.retry || true,
           // selector: { rx_model: name }
           filter: 'app/by_model',
-          query_params: { rx_model: name }
+          query_params: Object.defineProperty({}, this._field, { value: name })
         }
       });
     });
@@ -166,6 +179,7 @@ class Replication {
     // https://pouchdb.com/2015/04/05/filtered-replication.html
     const remoteIsUrl = typeof this.remote === 'string';
     const db = remoteIsUrl ? new PouchDB(this.remote) : this.remote;
+    const field = this._field;
     const doc = {
       version: 0,
       _id: '_design/app',
@@ -173,8 +187,9 @@ class Replication {
         // not doing fn.toString() as istambul code
         // on tests breaks it
         by_model: `function(doc, req) {
+
           return (
-            doc._id === '_design/app' || doc.rx_model === req.query.rx_model
+            doc._id === '_design/app' || doc.${field} === req.query.${field}
           );
         }`
       }
