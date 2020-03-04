@@ -1,9 +1,0 @@
-lib
-build
-dist
-out
-.vscode
-.cache
-coverage
-node_modules
-*.md
