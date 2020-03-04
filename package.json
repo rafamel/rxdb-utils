@@ -73,7 +73,7 @@
     "pouchdb-adapter-memory": "^7.2.1",
     "pouchdb-server": "^4.2.0",
     "promist": "^2.0.2",
-    "rxdb": "^8.0.4",
+    "rxdb": "8.6.0",
     "rxjs": "^6.3.3",
     "typescript": "^3.6.4"
   },
@@ -85,8 +85,8 @@
     "uuid": "^7.0.2"
   },
   "peerDependencies": {
-    "rxdb": "^8.0.0",
-    "rxjs": "^6.0.0"
+    "rxdb": ">= 8.0.0 < 8.7.0",
+    "rxjs": "6.x"
   },
   "husky": {
     "hooks": {
