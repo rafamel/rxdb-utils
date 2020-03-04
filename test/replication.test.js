@@ -199,7 +199,7 @@ describe(`- Sync`, () => {
 
     await db.collections.items.insert({ name: 'some' });
     const item = await db.collections.items.findOne().exec();
-    await waitUntil(() => dbPouch.get(item._id).catch(() => false));
+    await until(() => dbPouch.get(item._id).catch(() => false));
 
     expect(db.replications.length).toBe(1);
     expect(replication.replicationStates.length).toBe(1);
@@ -222,7 +222,7 @@ describe(`- Sync`, () => {
 
     await db.collections.items.insert({ name: 'some' });
     const item = await db.collections.items.findOne().exec();
-    await waitUntil(() => dbPouch.get(item._id).catch(() => false));
+    await until(() => dbPouch.get(item._id).catch(() => false));
 
     expect(db.replications.length).toBe(1);
     expect(replication.replicationStates.length).toBe(1);
