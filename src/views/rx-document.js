@@ -5,7 +5,6 @@ import { OBSERVABLES_SYMBOL, ENSURE_SYMBOL } from './constants';
 
 export default function RxDocument(proto, viewsArr) {
   // Define getters for views
-
   Object.defineProperties(
     proto,
     viewsArr.reduce((acc, [key, { get }]) => {

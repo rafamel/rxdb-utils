@@ -1,8 +1,6 @@
 import setup, { teardown, model } from './utils/db';
 
-test(`RxDocument.remove() doesn't throw after removal`, async () => {
-  expect.assertions(1);
-
+test(`RxDocument.remove doesn't throw after removal`, async () => {
   const db = await setup();
   await db.collection(model('items'));
 

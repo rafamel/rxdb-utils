@@ -90,6 +90,7 @@ class Replication {
   get alive$() {
     return this._aliveSubject.asObservable();
   }
+  // TODO: test error subscription
   get error$() {
     return this._errorSubject.asObservable();
   }
@@ -190,7 +191,6 @@ class Replication {
         // not doing fn.toString() as istambul code
         // on tests breaks it
         by_model: `function(doc, req) {
-
           return (
             doc._id === '_design/app' || doc.${field} === req.query.${field}
           );

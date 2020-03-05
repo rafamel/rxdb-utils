@@ -1,10 +1,8 @@
 import setup, { teardown, model } from '../utils/db';
 import * as Rx from 'rxjs';
-import { take } from 'rxjs/operators';
+import { subscribe } from 'promist';
 
 test(`RxDocument.select$ exists`, async () => {
-  expect.assertions(2);
-
   const db = await setup();
   const items = await db.collection({
     ...model('items')
@@ -17,10 +15,7 @@ test(`RxDocument.select$ exists`, async () => {
 
   await teardown(db);
 });
-
 test(`first level data property`, async () => {
-  expect.assertions(4);
-
   const db = await setup();
   const items = await db.collection({
     ...model('items')
@@ -31,10 +26,7 @@ test(`first level data property`, async () => {
     description: 'goodbye'
   });
 
-  const q = await item
-    .select$('name')
-    .pipe(take(1))
-    .toPromise();
+  const q = await subscribe(item.select$('name'));
 
   expect(q).toHaveProperty('name', 'hello');
   expect(q).toHaveProperty('_');
@@ -43,10 +35,7 @@ test(`first level data property`, async () => {
 
   await teardown(db);
 });
-
 test(`first level data properties`, async () => {
-  expect.assertions(5);
-
   const db = await setup();
   const items = await db.collection({
     ...model('items')
@@ -57,10 +46,7 @@ test(`first level data properties`, async () => {
     description: 'goodbye'
   });
 
-  const q = await item
-    .select$('name', 'description')
-    .pipe(take(1))
-    .toPromise();
+  const q = await subscribe(item.select$('name', 'description'));
 
   expect(q).toHaveProperty('name', 'hello');
   expect(q).toHaveProperty('description', 'goodbye');
@@ -70,8 +56,7 @@ test(`first level data properties`, async () => {
 
   await teardown(db);
 });
-
-test(`Deep properties w/ mixed data, views (computed), and observables in key`, async () => {
+test(`deep properties w/ mixed data, views, and observables in key`, async () => {
   expect.assertions(12);
 
   const db = await setup();
@@ -102,13 +87,12 @@ test(`Deep properties w/ mixed data, views (computed), and observables in key`, 
     description: 'goodbye'
   });
 
-  const q = await item
-    .select$('name', {
+  const q = await subscribe(
+    item.select$('name', {
       description: true,
       a: [{ a: ['b', 'c', 'e'] }, 'a.e.f']
     })
-    .pipe(take(1))
-    .toPromise();
+  );
 
   expect(q).toHaveProperty('name', 'hello');
   expect(q).toHaveProperty('description', 'goodbye');
@@ -125,8 +109,7 @@ test(`Deep properties w/ mixed data, views (computed), and observables in key`, 
 
   await teardown(db);
 });
-
-test(`None specified - all first level wo/ views`, async () => {
+test(`none specified; all first level wo/ views`, async () => {
   expect.assertions(6);
 
   const db = await setup();
@@ -139,10 +122,7 @@ test(`None specified - all first level wo/ views`, async () => {
     description: 'goodbye'
   });
 
-  const q = await item
-    .select$()
-    .pipe(take(1))
-    .toPromise();
+  const q = await subscribe(item.select$());
 
   expect(q).toHaveProperty('name', 'hello');
   expect(q).toHaveProperty('description', 'goodbye');
@@ -153,8 +133,7 @@ test(`None specified - all first level wo/ views`, async () => {
 
   await teardown(db);
 });
-
-test(`None specified - all first level w/ views`, async () => {
+test(`none specified; all first level w/ views`, async () => {
   expect.assertions(8);
 
   const db = await setup();
@@ -177,10 +156,7 @@ test(`None specified - all first level w/ views`, async () => {
     description: 'goodbye'
   });
 
-  const q = await item
-    .select$()
-    .pipe(take(1))
-    .toPromise();
+  const q = await subscribe(item.select$());
 
   expect(q).toHaveProperty('name', 'hello');
   expect(q).toHaveProperty('description', 'goodbye');

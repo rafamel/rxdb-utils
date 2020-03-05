@@ -1,16 +1,16 @@
-import parseProperties from '../../src/select/parse-properties';
+import parseProperties from '~/select/parse-properties';
 
-describe(`strings`, () => {
+describe(`succeeds w/ strings`, () => {
   test(`1 element`, () => {
     expect(parseProperties(['a'])).toEqual({ a: {} });
   });
-  test(`Multiple elements`, () => {
+  test(`multiple elements`, () => {
     expect(parseProperties(['a', 'b', 'c'])).toEqual({ a: {}, b: {}, c: {} });
   });
   test(`1 nested`, () => {
     expect(parseProperties(['a.b.c'])).toEqual({ a: { b: { c: {} } } });
   });
-  test(`Multiple nested`, () => {
+  test(`multiple nested`, () => {
     expect(parseProperties(['a.b.c', 'a.c', 'b.c.d'])).toEqual({
       a: { b: { c: {} }, c: {} },
       b: { c: { d: {} } }
@@ -18,14 +18,14 @@ describe(`strings`, () => {
   });
 });
 
-describe(`objects`, () => {
-  test(`Just object`, () => {
+describe(`succeeds w/ objects`, () => {
+  test(`just object`, () => {
     expect(parseProperties([{ a: { b: true, c: false }, b: true }])).toEqual({
       a: { b: {} },
       b: {}
     });
   });
-  test(`Mixed on array`, () => {
+  test(`mixed on array`, () => {
     expect(
       parseProperties([{ a: { b: true, c: true }, b: true }, 'd', 'b.c'])
     ).toEqual({
@@ -34,7 +34,7 @@ describe(`objects`, () => {
       d: {}
     });
   });
-  test(`Mixed on array & object`, () => {
+  test(`mixed on array and object`, () => {
     expect(
       parseProperties([
         {
@@ -63,11 +63,11 @@ describe(`objects`, () => {
   });
 });
 
-describe(`throws`, () => {
-  test(`input is not array`, () => {
+describe(`fails`, () => {
+  test(`fails when input is not array`, () => {
     expect(() => parseProperties('string')).toThrowError();
   });
-  test(`property is not string/object/array`, () => {
+  test(`fails when property is not string/object/array`, () => {
     expect(() => parseProperties([() => {}])).toThrowError();
   });
 });

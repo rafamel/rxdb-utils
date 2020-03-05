@@ -1,4 +1,4 @@
-import * as Rx from 'rxjs';
+import { combineLatest, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import parseProperties from './parse-properties';
 
@@ -12,10 +12,7 @@ export default function RxDocument(proto) {
       if (!Object.keys(properties).length) {
         const viewsKeys = this.collection._views;
         return viewsKeys && viewsKeys.length
-          ? Rx.combineLatest(
-              this.$,
-              ...viewsKeys.map((key) => this[key].$)
-            ).pipe(
+          ? combineLatest(this.$, ...viewsKeys.map((key) => this[key].$)).pipe(
               map((all) => ({
                 ...all[0],
                 ...viewsKeys.reduce(
@@ -31,7 +28,7 @@ export default function RxDocument(proto) {
       }
 
       // Properties specified, parse
-      return createCombinedObservable(Rx.of(this), properties);
+      return createCombinedObservable(of(this), properties);
     }
   });
 }
@@ -53,7 +50,7 @@ function createCombinedObservable(obs, properties) {
         });
       }
 
-      return Rx.combineLatest(
+      return combineLatest(
         ...getObs.map((getObsFn, i) => {
           const nextProperties = properties[keys[i]];
           return Object.keys(nextProperties).length

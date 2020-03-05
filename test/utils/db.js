@@ -4,7 +4,7 @@ import http from 'pouchdb-adapter-http';
 import { v4 as uuid } from 'uuid';
 import { wait } from 'promist';
 import { spawn } from 'child_process';
-import registerUtils from '../../src';
+import registerUtils from '~/index';
 
 RxDB.plugin(memory);
 RxDB.plugin(http);

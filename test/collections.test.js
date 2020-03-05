@@ -1,9 +1,7 @@
 import setup, { teardown, model } from './utils/db';
 
-describe(`- RxCollection`, () => {
+describe(`RxCollection`, () => {
   test(`collection.collections exists`, async () => {
-    expect.assertions(3);
-
     const db = await setup();
     await db.collection({
       ...model('items'),
@@ -16,9 +14,7 @@ describe(`- RxCollection`, () => {
     expect(typeof db.collections.items.collections).toBe('function');
     await teardown(db);
   });
-  test(`collection.collections exists (no statics, no methods)`, async () => {
-    expect.assertions(3);
-
+  test(`collection.collections exists; no statics, no methods`, async () => {
     const db = await setup();
     await db.collection(model('items'));
 
@@ -27,9 +23,7 @@ describe(`- RxCollection`, () => {
     expect(typeof db.collections.items.collections).toBe('function');
     await teardown(db);
   });
-  test(`collection.collections() returns collections`, async () => {
-    expect.assertions(4);
-
+  test(`collection.collections returns collections`, async () => {
     const db = await setup();
     await db.collection(model('items'));
     await db.collection(model('elements'));
@@ -45,10 +39,8 @@ describe(`- RxCollection`, () => {
   });
 });
 
-describe(`- RxDocument`, () => {
+describe(`RxDocument`, () => {
   test(`document.collections exists`, async () => {
-    expect.assertions(2);
-
     const db = await setup();
     await db.collection(model('items'));
     await db.collections.items.insert({ name: 'some' });
@@ -58,9 +50,7 @@ describe(`- RxDocument`, () => {
     expect(typeof item.collections).toBe('function');
     await teardown(db);
   });
-  test(`document.collections() returns collections`, async () => {
-    expect.assertions(4);
-
+  test(`document.collections returns collections`, async () => {
     const db = await setup();
     await db.collection(model('items'));
     await db.collection(model('elements'));

@@ -1,7 +1,7 @@
 import setup, { teardown, model } from './utils/db';
-import { wait, until } from 'promist';
-import * as Rx from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { wait, until, subscribe } from 'promist';
+import { of, from, isObservable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import {
   CLOSE_SUBSCRIPTION_TIMEOUT,
   CHECK_KEEP_OPEN_TIMEOUT,
@@ -15,16 +15,14 @@ const subsTimeout = () => {
 };
 
 describe(`RxDocument.view`, () => {
-  test(`Views are registered`, async () => {
-    expect.assertions(4);
-
+  test(`views are registered`, async () => {
     const db = await setup();
     await db.collection({
       ...model('items'),
       options: {
         views: {
           get element() {
-            return Rx.of();
+            return of();
           }
         }
       }
@@ -32,15 +30,12 @@ describe(`RxDocument.view`, () => {
     const item = await db.collections.items.insert({});
 
     expect(item.element).not.toBe(undefined);
-    expect(Rx.isObservable(item.element.$)).toBe(true);
+    expect(isObservable(item.element.$)).toBe(true);
     expect(item.element).toHaveProperty('exec');
     expect(item.element.exec()).toBeInstanceOf(Promise);
     await teardown(db);
   });
-
-  test(`view.$, view.exec(), & view.promise resolve`, async () => {
-    expect.assertions(3);
-
+  test(`view.$, view.exec, view.promise resolve`, async () => {
     const res = {};
     const db = await setup();
     await db.collection({
@@ -66,10 +61,7 @@ describe(`RxDocument.view`, () => {
 
     await teardown(db);
   });
-
-  test(`view.exec() executes again, view.promise doesn't`, async () => {
-    expect.assertions(9);
-
+  test(`view.exec executes again; view.promise doesn't`, async () => {
     let i = 0;
     const res = {};
     const db = await setup();
@@ -105,10 +97,7 @@ describe(`RxDocument.view`, () => {
     s.unsubscribe();
     await teardown(db);
   });
-
-  test(`view.value throws outside of ensure$()`, async () => {
-    expect.assertions(1);
-
+  test(`view.value throws outside of ensure$`, async () => {
     const res = {};
     const db = await setup();
     const collection = await db.collection({
@@ -129,10 +118,8 @@ describe(`RxDocument.view`, () => {
   });
 });
 
-describe(`RxQuery.ensure$()`, () => {
-  test(`ensure$() exists`, async () => {
-    expect.assertions(2);
-
+describe(`RxQuery.ensure$`, () => {
+  test(`ensure$ exists`, async () => {
     const db = await setup();
     const collection = await db.collection({
       ...model('items')
@@ -143,10 +130,7 @@ describe(`RxQuery.ensure$()`, () => {
 
     await teardown(db);
   });
-
-  test(`ensure$() throws on collections with no views`, async () => {
-    expect.assertions(1);
-
+  test(`ensure$ throws on collections with no views`, async () => {
     const db = await setup();
     const collection = await db.collection({
       ...model('items')
@@ -156,10 +140,7 @@ describe(`RxQuery.ensure$()`, () => {
 
     await teardown(db);
   });
-
-  test(`ensure$() works for one + unensures properly`, async () => {
-    expect.assertions(7);
-
+  test(`ensure$ works for one; unensures properly`, async () => {
     const res = {};
     const db = await setup();
     const collection = await db.collection({
@@ -167,7 +148,7 @@ describe(`RxQuery.ensure$()`, () => {
       options: {
         views: {
           get element() {
-            return Rx.from(wait(1000)).pipe(map(() => res));
+            return from(wait(1000)).pipe(map(() => res));
           }
         }
       }
@@ -175,11 +156,8 @@ describe(`RxQuery.ensure$()`, () => {
     await collection.insert({});
 
     const init = Date.now();
-    const item = await collection
-      .findOne()
-      .ensure$('element')
-      .pipe(take(1))
-      .toPromise();
+    const item = await subscribe(collection.findOne().ensure$('element'));
+
     const end = Date.now();
 
     expect(end - init).toBeGreaterThanOrEqual(1000);
@@ -194,28 +172,20 @@ describe(`RxQuery.ensure$()`, () => {
 
     await teardown(db);
   });
-
-  test(`ensure$() works with find() queries too + unensures properly`, async () => {
-    expect.assertions(4);
-
+  test(`ensure$ works with find queries too; unensures properly`, async () => {
     const db = await setup();
     const collection = await db.collection({
       ...model('items'),
       options: {
         views: {
           get element() {
-            return Rx.of(1);
+            return of(1);
           }
         }
       }
     });
     const item = await collection.insert({});
-
-    await collection
-      .find()
-      .ensure$('element')
-      .pipe(take(1))
-      .toPromise();
+    await subscribe(collection.find().ensure$('element'));
 
     expect(item.element.ensured).toBe(true);
     expect(() => item.element.value).not.toThrow();
@@ -226,23 +196,20 @@ describe(`RxQuery.ensure$()`, () => {
 
     await teardown(db);
   });
-
-  test(`ensure$() works for two + unensures properly`, async () => {
-    expect.assertions(14);
-
+  test(`ensure$ works for two; unensures properly`, async () => {
     const db = await setup();
     const collection = await db.collection({
       ...model('items'),
       options: {
         views: {
           get element() {
-            return Rx.from(wait(1000)).pipe(map(() => 'a'));
+            return from(wait(1000)).pipe(map(() => 'a'));
           },
           get element2() {
-            return Rx.from(wait(2000)).pipe(map(() => 'b'));
+            return from(wait(2000)).pipe(map(() => 'b'));
           },
           get element3() {
-            return Rx.from(wait(3000)).pipe(map(() => 'c'));
+            return from(wait(3000)).pipe(map(() => 'c'));
           }
         }
       }
@@ -250,11 +217,10 @@ describe(`RxQuery.ensure$()`, () => {
     await collection.insert({});
 
     const init = Date.now();
-    const item = await collection
-      .findOne()
-      .ensure$('element', 'element2')
-      .pipe(take(1))
-      .toPromise();
+    const item = await subscribe(
+      collection.findOne().ensure$('element', 'element2')
+    );
+
     const end = Date.now();
 
     expect(end - init).toBeGreaterThanOrEqual(2000);
@@ -276,10 +242,7 @@ describe(`RxQuery.ensure$()`, () => {
 
     await teardown(db);
   });
-
-  test(`ensure$() fires immediately when another subscription is active`, async () => {
-    expect.assertions(5);
-
+  test(`ensure$ fires immediately when another subscription is active`, async () => {
     const res = {};
     const db = await setup();
     const collection = await db.collection({
@@ -287,7 +250,7 @@ describe(`RxQuery.ensure$()`, () => {
       options: {
         views: {
           get element() {
-            return Rx.from(wait(2000)).pipe(map(() => res));
+            return from(wait(2000)).pipe(map(() => res));
           }
         }
       }
@@ -324,34 +287,27 @@ describe(`RxQuery.ensure$()`, () => {
 
     await teardown(db);
   });
-
-  test(`ensure$() selects all with no args + unensures properly`, async () => {
-    expect.assertions(12);
-
+  test(`ensure$ selects all with no args; unensures properly`, async () => {
     const db = await setup();
     const collection = await db.collection({
       ...model('items'),
       options: {
         views: {
           get element() {
-            return Rx.of(1);
+            return of(1);
           },
           get element2() {
-            return Rx.of(2);
+            return of(2);
           },
           get element3() {
-            return Rx.of(3);
+            return of(3);
           }
         }
       }
     });
     await collection.insert({});
 
-    const item = await collection
-      .findOne()
-      .ensure$()
-      .pipe(take(1))
-      .toPromise();
+    const item = await subscribe(collection.findOne().ensure$());
 
     expect(() => item.element.value).not.toThrow();
     expect(() => item.element2.value).not.toThrow();
@@ -370,17 +326,14 @@ describe(`RxQuery.ensure$()`, () => {
 
     await teardown(db);
   });
-
   test(`unensures only when subscriptions to single ensure cease`, async () => {
-    expect.assertions(4);
-
     const db = await setup();
     const collection = await db.collection({
       ...model('items'),
       options: {
         views: {
           get element() {
-            return Rx.of(1);
+            return of(1);
           }
         }
       }
@@ -408,20 +361,17 @@ describe(`RxQuery.ensure$()`, () => {
 
     await teardown(db);
   });
-
   test(`unensures only when subscriptions to multiple ensures cease`, async () => {
-    expect.assertions(5);
-
     const db = await setup();
     const collection = await db.collection({
       ...model('items'),
       options: {
         views: {
           get element() {
-            return Rx.of(1);
+            return of(1);
           },
           get element2() {
-            return Rx.of(2);
+            return of(2);
           }
         }
       }
@@ -453,17 +403,14 @@ describe(`RxQuery.ensure$()`, () => {
 
     await teardown(db);
   });
-
-  test(`ensure$() can be reused once closed`, async () => {
-    expect.assertions(4);
-
+  test(`ensure$ can be reused once closed`, async () => {
     const db = await setup();
     const collection = await db.collection({
       ...model('items'),
       options: {
         views: {
           get element() {
-            return Rx.of(1);
+            return of(1);
           }
         }
       }
@@ -480,7 +427,7 @@ describe(`RxQuery.ensure$()`, () => {
 
     expect(item.element.ensured).toBe(false);
 
-    const el = await e.pipe(take(1)).toPromise();
+    const el = await subscribe(e);
     expect(el.element.ensured).toBe(true);
     expect(el.element.value).toBe(1);
 
@@ -489,17 +436,14 @@ describe(`RxQuery.ensure$()`, () => {
 
     await teardown(db);
   });
-
   test(`unensures when query changes`, async () => {
-    expect.assertions(5);
-
     const db = await setup();
     const collection = await db.collection({
       ...model('items'),
       options: {
         views: {
           get element() {
-            return Rx.of(1);
+            return of(1);
           }
         }
       }

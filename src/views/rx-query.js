@@ -1,4 +1,4 @@
-import * as Rx from 'rxjs';
+import { of, combineLatest } from 'rxjs';
 import { switchMap, map, take } from 'rxjs/operators';
 import flattenDeep from 'lodash.flattendeep';
 import hash from 'object-hash';
@@ -35,7 +35,7 @@ function createEnsure(observable, properties) {
 
   const obs = observable.pipe(
     switchMap((ans) => {
-      if (!ans) return Rx.of(ans);
+      if (!ans) return of(ans);
 
       const docs = Array.isArray(ans) ? ans : [ans];
       const rxArr = [];
@@ -53,11 +53,11 @@ function createEnsure(observable, properties) {
       });
 
       return rxArr.length
-        ? Rx.combineLatest(...rxArr).pipe(
+        ? combineLatest(...rxArr).pipe(
             take(1),
             map(() => ans)
           )
-        : Rx.of(ans);
+        : of(ans);
     })
   );
 

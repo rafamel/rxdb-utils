@@ -4,10 +4,8 @@ import { until } from 'promist';
 
 jest.setTimeout(20000);
 
-describe(`- Basic setup`, () => {
+describe(`basic setup`, () => {
   test(`throws when model doesn't have a name property`, async () => {
-    expect.assertions(1);
-
     const db = await setup();
     const data = model('items');
     delete data.name;
@@ -16,8 +14,6 @@ describe(`- Basic setup`, () => {
     await teardown(db);
   });
   test(`throws when there is no schema or no schema.properties`, async () => {
-    expect.assertions(2);
-
     const db = await setup();
     const data1 = model('items');
     const data2 = model('items');
@@ -29,8 +25,6 @@ describe(`- Basic setup`, () => {
     await teardown(db);
   });
   test(`throws when a property is called rx_model`, async () => {
-    expect.assertions(1);
-
     const db = await setup();
     const data = model('items');
     data.schema.properties.rx_model = {
@@ -43,8 +37,6 @@ describe(`- Basic setup`, () => {
     await teardown(db);
   });
   test(`doesn't throw when a property called rx_model has the same definition`, async () => {
-    expect.assertions(1);
-
     const db = await setup();
     const data = model('items');
     data.schema.properties.rx_model = {
@@ -57,8 +49,6 @@ describe(`- Basic setup`, () => {
     await teardown(db);
   });
   test(`adds rx_model`, async () => {
-    expect.assertions(1);
-
     const db = await setup();
     await db.collection(model('items'));
     await db.collections.items.insert({});
@@ -68,8 +58,6 @@ describe(`- Basic setup`, () => {
     await teardown(db);
   });
   test(`throws when a property is has the same name as the custom field`, async () => {
-    expect.assertions(1);
-
     const db = await setup({ replication: { field: 'custom' } });
     const data = model('items');
     data.schema.properties.custom = {
@@ -82,8 +70,6 @@ describe(`- Basic setup`, () => {
     await teardown(db);
   });
   test(`doesn't throw when a property has the same name and definition as the custom field`, async () => {
-    expect.assertions(1);
-
     const db = await setup({ replication: { field: 'custom' } });
     const data = model('items');
     data.schema.properties.custom = {
@@ -96,8 +82,6 @@ describe(`- Basic setup`, () => {
     await teardown(db);
   });
   test(`adds custom field`, async () => {
-    expect.assertions(1);
-
     const db = await setup({ replication: { field: 'custom' } });
     await db.collection(model('items'));
     await db.collections.items.insert({});
@@ -106,27 +90,19 @@ describe(`- Basic setup`, () => {
     expect(item.custom).toBe('items');
     await teardown(db);
   });
-  test(`db.replicate() exists`, async () => {
-    expect.assertions(1);
-
+  test(`db.replicate exists`, async () => {
     const db = await setup();
 
     expect(typeof db.replicate).toBe('function');
     await teardown(db);
   });
-
   test(`db.replications exists`, async () => {
-    expect.assertions(1);
-
     const db = await setup();
 
     expect(Array.isArray(db.replications)).toBe(true);
     await teardown(db);
   });
-
   test(`replication methods and properties`, async () => {
-    expect.assertions(7);
-
     const db = await setup();
     const dbPouch = pouchSetup();
     const replication = db.replicate(dbPouch);
@@ -143,10 +119,8 @@ describe(`- Basic setup`, () => {
   });
 });
 
-describe(`- Sync`, () => {
-  test(`Sync works with rx_model default`, async () => {
-    expect.assertions(3);
-
+describe(`sync`, () => {
+  test(`sync works with rx_model default`, async () => {
     const db = await setup();
     await db.collection(model('items'));
 
@@ -164,9 +138,7 @@ describe(`- Sync`, () => {
 
     await teardown(replication, dbPouch, db);
   });
-  test(`Sync w/ keyCompression works with rx_model default`, async () => {
-    expect.assertions(3);
-
+  test(`sync w/ keyCompression works with rx_model default`, async () => {
     const db = await setup();
     await db.collection({
       ...model('items'),
@@ -187,9 +159,7 @@ describe(`- Sync`, () => {
 
     await teardown(replication, dbPouch, db);
   });
-  test(`Sync works with custom field`, async () => {
-    expect.assertions(3);
-
+  test(`sync works with custom field`, async () => {
     const db = await setup({ replication: { field: 'custom' } });
     await db.collection(model('items'));
 
@@ -207,9 +177,7 @@ describe(`- Sync`, () => {
 
     await teardown(replication, dbPouch, db);
   });
-  test(`Sync w/ keyCompression works with custom field`, async () => {
-    expect.assertions(3);
-
+  test(`sync w/ keyCompression works with custom field`, async () => {
     const db = await setup({ replication: { field: 'custom' } });
     await db.collection({
       ...model('items'),
@@ -230,9 +198,7 @@ describe(`- Sync`, () => {
 
     await teardown(replication, dbPouch, db);
   });
-  test(`Double sync works`, async () => {
-    expect.assertions(3);
-
+  test(`double sync works`, async () => {
     const db = await setup();
     await db.collection(model('items'));
 
@@ -261,9 +227,7 @@ describe(`- Sync`, () => {
 
     await teardown(replication1, replication2, dbPouch1, dbPouch2, db);
   });
-  test(`Selective sync works`, async () => {
-    expect.assertions(3);
-
+  test(`selective sync works`, async () => {
     const db = await setup();
     await db.collection(model('items'));
     await db.collection(model('elements'));
@@ -284,9 +248,7 @@ describe(`- Sync`, () => {
 
     await teardown(replication, dbPouch, db);
   });
-  test(`Collections selection works`, async () => {
-    expect.assertions(2);
-
+  test(`collection selection works`, async () => {
     const db = await setup();
     await db.collection(model('items'));
     await db.collection(model('elements'));
@@ -311,10 +273,8 @@ describe(`- Sync`, () => {
   });
 });
 
-describe(`- Functionality`, () => {
-  test(`replication.close() closes the connection`, async () => {
-    expect.assertions(2);
-
+describe(`functionality`, () => {
+  test(`replication.close closes the connection`, async () => {
     const db = await setup();
     await db.collection(model('items'));
 
@@ -337,9 +297,7 @@ describe(`- Functionality`, () => {
 
     await teardown(replication, dbPouch, db);
   });
-  test(`replication.destroy() destroys replication`, async () => {
-    expect.assertions(2);
-
+  test(`replication.destroy destroys replication`, async () => {
     const db = await setup();
     await db.collection(model('items'));
 
@@ -364,10 +322,8 @@ describe(`- Functionality`, () => {
   });
 });
 
-describe(`- Remote sync`, () => {
-  test(`Basic remote sync works`, async () => {
-    expect.assertions(3);
-
+describe(`remote sync`, () => {
+  test(`basic remote sync works`, async () => {
     const { run, url } = server();
     const proc = await run();
 
@@ -389,9 +345,7 @@ describe(`- Remote sync`, () => {
     await teardown(replication, dbPouch, db);
     proc.kill('SIGINT');
   });
-  test(`Recovers connection midway`, async () => {
-    expect.assertions(3);
-
+  test(`recovers connection midway`, async () => {
     const { run, url } = server();
 
     const db = await setup();
@@ -415,9 +369,7 @@ describe(`- Remote sync`, () => {
     await teardown(replication, dbPouch, db);
     proc.kill('SIGINT');
   });
-  test(`Alive subscriptions work`, async () => {
-    expect.assertions(4);
-
+  test(`alive subscriptions work`, async () => {
     const { run, url } = server();
 
     const db = await setup();

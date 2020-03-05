@@ -1,8 +1,6 @@
 import setup, { teardown, model } from './utils/db';
 
 test(`preInsert runs`, async () => {
-  expect.assertions(1);
-
   let run;
   const db = await setup();
   await db.collection({
@@ -18,10 +16,7 @@ test(`preInsert runs`, async () => {
   expect(run).toBe(true);
   await teardown(db);
 });
-
 test(`preInsert runs for inMemory`, async () => {
-  expect.assertions(1);
-
   let run;
   const db = await setup();
   const collection = await db.collection({
@@ -38,10 +33,7 @@ test(`preInsert runs for inMemory`, async () => {
   expect(run).toBe(true);
   await teardown(db);
 });
-
 test(`preInsert receives data and collection`, async () => {
-  expect.assertions(4);
-
   let rData, rCollection;
   const db = await setup();
   await db.collection({
@@ -63,10 +55,7 @@ test(`preInsert receives data and collection`, async () => {
   expect(rCollection.insert).not.toBe(undefined);
   await teardown(db);
 });
-
 test(`all run`, async () => {
-  expect.assertions(7);
-
   let preInsert,
     postInsert,
     preSave,
@@ -106,10 +95,7 @@ test(`all run`, async () => {
   expect(postRemove).toBe(true);
   await teardown(db);
 });
-
 test(`all are this bind to collection`, async () => {
-  expect.assertions(7);
-
   let preInsert,
     postInsert,
     preSave,
@@ -163,10 +149,7 @@ test(`all are this bind to collection`, async () => {
   expect(postRemove).toHaveProperty('insert');
   await teardown(db);
 });
-
 test(`postInsert is bind to inMemory collection`, async () => {
-  expect.assertions(1);
-
   let postInsert;
   const db = await setup();
   const collection = await db.collection({

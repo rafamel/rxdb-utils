@@ -2,8 +2,6 @@ import setup, { teardown, model } from './utils/db';
 import { wait } from 'promist';
 
 test(`throws when there is no schema or no schema.properties`, async () => {
-  expect.assertions(2);
-
   const db = await setup();
   const data1 = model('items');
   const data2 = model('items');
@@ -14,10 +12,7 @@ test(`throws when there is no schema or no schema.properties`, async () => {
   await expect(db.collection(data2)).rejects.toThrowError();
   await teardown(db);
 });
-
 test(`timestamps are not inserted when absent`, async () => {
-  expect.assertions(2);
-
   const db = await setup();
   await db.collection(model('items'));
   await db.collections.items.insert({});
@@ -27,10 +22,7 @@ test(`timestamps are not inserted when absent`, async () => {
   expect(item.updatedAt).toBe(undefined);
   await teardown(db);
 });
-
 test(`timestamps are inserted when flagged true on database only`, async () => {
-  expect.assertions(2);
-
   const db = await setup({ timestamps: true });
   await db.collection(model('items'));
   await db.collections.items.insert({});
@@ -40,10 +32,7 @@ test(`timestamps are inserted when flagged true on database only`, async () => {
   expect(item.updatedAt).not.toBe(undefined);
   await teardown(db);
 });
-
 test(`timestamps are inserted properly with database overrides only`, async () => {
-  expect.assertions(4);
-
   const db = await setup({
     timestamps: {
       createdAt: 'created_renamed',
@@ -60,10 +49,7 @@ test(`timestamps are inserted properly with database overrides only`, async () =
   expect(item.updated_renamed).not.toBe(undefined);
   await teardown(db);
 });
-
 test(`timestamps are inserted when flagged true on collection only`, async () => {
-  expect.assertions(4);
-
   const db = await setup();
   await db.collection(model('items'));
   await db.collection({
@@ -82,10 +68,7 @@ test(`timestamps are inserted when flagged true on collection only`, async () =>
 
   await teardown(db);
 });
-
 test(`timestamps are inserted with collection overrides only`, async () => {
-  expect.assertions(8);
-
   const db = await setup();
   await db.collection(model('items'));
   await db.collection({
@@ -112,10 +95,7 @@ test(`timestamps are inserted with collection overrides only`, async () => {
   expect(override.updated_renamed).not.toBe(undefined);
   await teardown(db);
 });
-
 test(`timestamps are inserted properly when collection overrides defaults`, async () => {
-  expect.assertions(8);
-
   const db = await setup({ timestamps: true });
 
   await db.collection(model('items'));
@@ -142,10 +122,7 @@ test(`timestamps are inserted properly when collection overrides defaults`, asyn
   expect(override.created_renamed).not.toBe(undefined);
   expect(override.updated_renamed).not.toBe(undefined);
 });
-
 test(`timestamps are not inserted when collection disables`, async () => {
-  expect.assertions(4);
-
   const db = await setup({ timestamps: true });
 
   await db.collection(model('items'));
@@ -165,10 +142,7 @@ test(`timestamps are not inserted when collection disables`, async () => {
 
   await teardown(db);
 });
-
 test(`timestamps on creation are correct`, async () => {
-  expect.assertions(4);
-
   const beforeDate = new Date();
   await wait(100);
 
@@ -189,10 +163,7 @@ test(`timestamps on creation are correct`, async () => {
   expect(afterDate > new Date(item.updatedAt)).toBe(true);
   await teardown(db);
 });
-
 test(`timestamps on update are correct`, async () => {
-  expect.assertions(4);
-
   const beforeDate = new Date();
   await wait(100);
 
@@ -219,10 +190,7 @@ test(`timestamps on update are correct`, async () => {
   expect(afterDate > new Date(item.updatedAt)).toBe(true);
   await teardown(db);
 });
-
 test(`maintains createdAt if specified`, async () => {
-  expect.assertions(2);
-
   const date = new Date().toISOString();
 
   const db = await setup();
@@ -237,10 +205,7 @@ test(`maintains createdAt if specified`, async () => {
   expect(item.updatedAt).not.toBe(date);
   await teardown(db);
 });
-
 test(`maintains updatedAt if specified`, async () => {
-  expect.assertions(2);
-
   const date = new Date().toISOString();
 
   const db = await setup();

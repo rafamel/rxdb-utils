@@ -1,8 +1,6 @@
 import setup, { teardown, model } from './utils/db';
 
 test(`values are inserted`, async () => {
-  expect.assertions(2);
-
   const db = await setup();
   await db.collection({
     ...model('items'),
@@ -20,10 +18,7 @@ test(`values are inserted`, async () => {
   expect(item.description).toBe('myDescription');
   await teardown(db);
 });
-
 test(`explicit values override defaults`, async () => {
-  expect.assertions(2);
-
   const db = await setup();
   await db.collection({
     ...model('items'),

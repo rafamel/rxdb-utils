@@ -1,4 +1,4 @@
-import { from, of as observableOf } from 'rxjs';
+import { from, of } from 'rxjs';
 import { take, switchMap } from 'rxjs/operators';
 
 export default {
@@ -29,7 +29,7 @@ export default {
               piping = switchMap((obj) => {
                 // eslint-disable-next-line babel/no-invalid-this
                 const res = get.call(this, obj);
-                return res.then ? from(res) : observableOf(res);
+                return res.then ? from(res) : of(res);
               });
             }
             return {
