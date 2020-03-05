@@ -80,7 +80,6 @@
   "dependencies": {
     "lodash.flattendeep": "^4.4.0",
     "lodash.merge": "^4.6.1",
-    "loglevel": "^1.6.1",
     "object-hash": "^2.0.3",
     "uuid": "^7.0.2"
   },

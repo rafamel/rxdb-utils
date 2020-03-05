@@ -62,17 +62,6 @@ RxDB.plugin(hooks);
 RxDB.plugin(replication);
 ```
 
-### Logging
-
-You can set up the logging level on the console for plugins by doing (default is `WARN` on development and `ERROR` on production):
-
-```javascript
-import { loglevel, loglevels } from 'rxdb-utils/logger';
-
-// Or any other from { SILENT, TRACE, DEBUG, INFO, WARN, ERROR }
-loglevel(loglevels.WARN);
-```
-
 ## Plugins
 
 ### models
