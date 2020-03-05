@@ -36,28 +36,7 @@ describe(`basic setup`, () => {
     await expect(db.collection(data)).rejects.toThrowError();
     await teardown(db);
   });
-  test(`doesn't throw when a property called rx_model has the same definition`, async () => {
-    const db = await setup();
-    const data = model('items');
-    data.schema.properties.rx_model = {
-      type: 'string',
-      enum: ['items'],
-      default: 'items'
-    };
-
-    await expect(db.collection(data)).resolves.toBeTruthy();
-    await teardown(db);
-  });
-  test(`adds rx_model`, async () => {
-    const db = await setup();
-    await db.collection(model('items'));
-    await db.collections.items.insert({});
-    const item = await db.collections.items.findOne().exec();
-
-    expect(item.rx_model).toBe('items');
-    await teardown(db);
-  });
-  test(`throws when a property is has the same name as the custom field`, async () => {
+  test(`throws when a property has the same name w/ a custom field`, async () => {
     const db = await setup({ replication: { field: 'custom' } });
     const data = model('items');
     data.schema.properties.custom = {
@@ -69,7 +48,19 @@ describe(`basic setup`, () => {
     await expect(db.collection(data)).rejects.toThrowError();
     await teardown(db);
   });
-  test(`doesn't throw when a property has the same name and definition as the custom field`, async () => {
+  test(`doesn't throw when a property rx_model has the same definition`, async () => {
+    const db = await setup();
+    const data = model('items');
+    data.schema.properties.rx_model = {
+      type: 'string',
+      enum: ['items'],
+      default: 'items'
+    };
+
+    await expect(db.collection(data)).resolves.toBeTruthy();
+    await teardown(db);
+  });
+  test(`doesn't throw when a property has the same name and definition w/ a custom field`, async () => {
     const db = await setup({ replication: { field: 'custom' } });
     const data = model('items');
     data.schema.properties.custom = {
@@ -79,6 +70,15 @@ describe(`basic setup`, () => {
     };
 
     await expect(db.collection(data)).resolves.toBeTruthy();
+    await teardown(db);
+  });
+  test(`adds default rx_model field`, async () => {
+    const db = await setup();
+    await db.collection(model('items'));
+    await db.collections.items.insert({});
+    const item = await db.collections.items.findOne().exec();
+
+    expect(item.rx_model).toBe('items');
     await teardown(db);
   });
   test(`adds custom field`, async () => {
@@ -120,7 +120,7 @@ describe(`basic setup`, () => {
 });
 
 describe(`sync`, () => {
-  test(`sync works with rx_model default`, async () => {
+  test(`sync works w/ default rx_model field`, async () => {
     const db = await setup();
     await db.collection(model('items'));
 
@@ -138,7 +138,25 @@ describe(`sync`, () => {
 
     await teardown(replication, dbPouch, db);
   });
-  test(`sync w/ keyCompression works with rx_model default`, async () => {
+  test(`sync works w/ custom field`, async () => {
+    const db = await setup({ replication: { field: 'custom' } });
+    await db.collection(model('items'));
+
+    const dbPouch = pouchSetup();
+    const replication = db.replicate(dbPouch);
+    await replication.connect();
+
+    await db.collections.items.insert({ name: 'some' });
+    const item = await db.collections.items.findOne().exec();
+    await until(() => dbPouch.get(item._id).catch(() => false));
+
+    expect(db.replications.length).toBe(1);
+    expect(replication.replicationStates.length).toBe(1);
+    await expect(dbPouch.get(item._id)).resolves.toHaveProperty('name', 'some');
+
+    await teardown(replication, dbPouch, db);
+  });
+  test(`sync w/ keyCompression works w/ default rx_model field`, async () => {
     const db = await setup();
     await db.collection({
       ...model('items'),
@@ -159,25 +177,7 @@ describe(`sync`, () => {
 
     await teardown(replication, dbPouch, db);
   });
-  test(`sync works with custom field`, async () => {
-    const db = await setup({ replication: { field: 'custom' } });
-    await db.collection(model('items'));
-
-    const dbPouch = pouchSetup();
-    const replication = db.replicate(dbPouch);
-    await replication.connect();
-
-    await db.collections.items.insert({ name: 'some' });
-    const item = await db.collections.items.findOne().exec();
-    await until(() => dbPouch.get(item._id).catch(() => false));
-
-    expect(db.replications.length).toBe(1);
-    expect(replication.replicationStates.length).toBe(1);
-    await expect(dbPouch.get(item._id)).resolves.toHaveProperty('name', 'some');
-
-    await teardown(replication, dbPouch, db);
-  });
-  test(`sync w/ keyCompression works with custom field`, async () => {
+  test(`sync w/ keyCompression works w/ custom field`, async () => {
     const db = await setup({ replication: { field: 'custom' } });
     await db.collection({
       ...model('items'),

@@ -8,13 +8,24 @@ export default {
   overwritable: {
     createKeyCompressor(schema, ...args) {
       const ans = overwritable.createKeyCompressor(schema, ...args);
-      for (const rxModel in schema.normalized.properties) {
-        if (schema.normalized.properties[rxModel].rx_model) {
-          ans._table = ans.table;
-          ans._table[rxModel] = rxModel;
+
+      let found = false;
+      const entries = Object.entries(schema.normalized.properties);
+      for (const [field, value] of entries) {
+        if (value && value.rx_model) {
+          found = true;
+          ans._table = { ...ans.table, [field]: field };
           break;
         }
       }
+
+      /* istanbul ignore next */
+      if (!found) {
+        throw Error(
+          `No field replication field was found on schema normalized properties`
+        );
+      }
+
       return ans;
     }
   },
@@ -68,7 +79,6 @@ export default {
 
 class Replication {
   constructor(database, remote, collectionNames, direction, options = {}) {
-    this._field = database.options.replication.field;
     this.remote = remote;
     this.directon = direction;
     this.options = options;
@@ -80,12 +90,14 @@ class Replication {
         }, {});
 
     this.replicationStates = [];
-    this._pReplicationStates = Promise.resolve([]);
-    this._subscribers = [];
-    this._states = [];
     this.alive = false;
+
+    this._field = database.options.replication.field;
+    this._states = [];
+    this._subscribers = [];
     this._aliveSubject = new BehaviorSubject(false);
     this._errorSubject = new Subject();
+    this._pReplicationStates = Promise.resolve([]);
   }
   get alive$() {
     return this._aliveSubject.asObservable();
@@ -137,9 +149,6 @@ class Replication {
     const collections = this.collections;
     const collectionNames = Object.keys(collections);
     const promises = collectionNames.map((name) => {
-      // const query_params = {};
-      // query_params[this._field] = name;
-
       return collections[name].sync({
         remote: this.remote,
         direction: this.direction,
@@ -149,7 +158,7 @@ class Replication {
           retry: this.options.retry || true,
           // selector: { rx_model: name }
           filter: 'app/by_model',
-          query_params: Object.defineProperty({}, this._field, { value: name })
+          query_params: { [this._field]: name }
         }
       });
     });
@@ -181,9 +190,9 @@ class Replication {
   }
   async _createFilter() {
     // https://pouchdb.com/2015/04/05/filtered-replication.html
+    const field = this._field;
     const remoteIsUrl = typeof this.remote === 'string';
     const db = remoteIsUrl ? new PouchDB(this.remote) : this.remote;
-    const field = this._field;
     const doc = {
       version: 0,
       _id: '_design/app',
@@ -192,7 +201,7 @@ class Replication {
         // on tests breaks it
         by_model: `function(doc, req) {
           return (
-            doc._id === '_design/app' || doc.${field} === req.query.${field}
+            doc._id === '_design/app' || doc["${field}"] === req.query["${field}"]
           );
         }`
       }
