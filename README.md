@@ -393,6 +393,7 @@ Additionally, they have the properties:
 * `replicationStates`: An array of [`RxReplicationState`s](https://pubkey.github.io/rxdb/replication.html) for the synced collections of the database.
 * `alive`: Boolean. Indicates whether the replication is alive. Will be `false` when there are connectivity problems.
 * `alive$`: A RxJS observable stream. Same as `alive`.
+* `error$`: An observable of connection `Error`s.
 
 ```javascript
 const dbPromise = RxDB.create({
