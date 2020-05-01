@@ -68,7 +68,7 @@
     "coveralls": "^3.0.7",
     "husky": "^4.2.3",
     "kpo": "^0.11.1",
-    "onchange": "^6.0.0",
+    "onchange": "^7.0.0",
     "pouchdb-adapter-http": "^7.2.1",
     "pouchdb-adapter-memory": "^7.2.1",
     "pouchdb-server": "^4.2.0",
