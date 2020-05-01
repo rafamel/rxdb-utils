@@ -84,7 +84,7 @@
     "uuid": "^7.0.2"
   },
   "peerDependencies": {
-    "rxdb": ">= 8.0.0 < 8.7.0",
+    "rxdb": "< 8.9.1",
     "rxjs": "6.x"
   },
   "husky": {
