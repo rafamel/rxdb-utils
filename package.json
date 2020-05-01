@@ -72,7 +72,7 @@
     "pouchdb-adapter-http": "^7.2.1",
     "pouchdb-adapter-memory": "^7.2.1",
     "pouchdb-server": "^4.2.0",
-    "promist": "^2.0.2",
+    "promist": "^3.0.0",
     "rxdb": "8.6.0",
     "rxjs": "^6.3.3",
     "typescript": "^3.6.4"
