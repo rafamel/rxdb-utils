@@ -23,18 +23,18 @@ You can either register them one by one - choosing only those you'd like to add,
 ### Register all plugins
 
 ```javascript
-import * as RxDB from 'rxdb';
+import { addRxPlugin } from 'rxdb';
 import memory from 'pouchdb-adapter-memory';
 import register from 'rxdb-utils';
 
-RxDB.plugin(memory); // Registering the usual pouchdb plugins
-register(RxDB); // Registering all plugins provided by rxdb-utils
+addRxPlugin(memory); // Registering the usual pouchdb plugins
+register(addRxPlugin); // Registering all plugins provided by rxdb-utils
 ```
 
 ### Register plugins one by one
 
 ```javascript
-import * as RxDB from 'rxdb';
+import { addRxPlugin } from 'rxdb';
 import memory from 'pouchdb-adapter-memory';
 // rxdb-utils imports
 import models from 'rxdb-utils/models';
@@ -48,18 +48,18 @@ import hooks from 'rxdb-utils/hooks';
 import replication from 'rxdb-utils/replication';
 
 // Registering the usual pouchdb plugins
-RxDB.plugin(memory);
+addRxPlugin(memory);
 
 // Registering rxdb-utils plugins one by one
-RxDB.plugin(models);
-RxDB.plugin(collections);
-RxDB.plugin(defaultValues);
-RxDB.plugin(timestamps);
-RxDB.plugin(views);
-RxDB.plugin(select);
-RxDB.plugin(observables);
-RxDB.plugin(hooks);
-RxDB.plugin(replication);
+addRxPlugin(models);
+addRxPlugin(collections);
+addRxPlugin(defaultValues);
+addRxPlugin(timestamps);
+addRxPlugin(views);
+addRxPlugin(select);
+addRxPlugin(observables);
+addRxPlugin(hooks);
+addRxPlugin(replication);
 ```
 
 ## Plugins
